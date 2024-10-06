@@ -1,7 +1,12 @@
-const { DataTypes } = require('sequelize');
-const { sequelize } = require('../../config/db');
-
-const Faculty = sequelize.define('Faculty', {
+module.exports = (sequelize) => {
+  const { DataTypes } = require('sequelize');
+  const Faculty = sequelize.define('Faculty', {
+  id: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    primaryKey: true,
+    autoIncrement: true,
+  },
   name: {
     type: DataTypes.STRING(100),
     allowNull: false,
@@ -10,6 +15,4 @@ const Faculty = sequelize.define('Faculty', {
     type: DataTypes.STRING(10),
     allowNull: false,
   },
-});
-
-module.exports = Faculty;
+})}

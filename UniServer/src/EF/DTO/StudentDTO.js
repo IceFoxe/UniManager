@@ -1,9 +1,12 @@
-class ProfessorDTO {
-  constructor(id, firstName, lastName, email, title) {
+class StudentDTO {
+  constructor(id, firstName, lastName, studentNumber, majorId, accountId) {
     this.id = id;
     this.firstName = firstName;
     this.lastName = lastName;
-    this.email = email;
-    this.title = title;
+    this.studentNumber = studentNumber;
+    this.majorId = majorId;
+    this.accountId = accountId;
   }
 }
+
+module.exports = StudentDTO;
