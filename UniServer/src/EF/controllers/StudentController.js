@@ -17,6 +17,7 @@ class StudentController {
       if (student) {
         res.json(student);
       } else {
+        console.log("no student");
         res.status(404).json({ message: 'Student not found' });
       }
     } catch (error) {

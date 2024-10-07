@@ -45,9 +45,9 @@ module.exports = (sequelize) => {
 
   Student.associate = (models) => {
     // Define associations here
-    Student.belongsTo(models.Major, { foreignKey: 'majorId' });
-    Student.belongsTo(models.Account, { foreignKey: 'accountId' });
-    Student.hasMany(models.Grade, { foreignKey: 'student_id' });
+    //Student.belongsTo(sequelize.models.Major, { foreignKey: 'majorId' });
+    //Student.belongsTo(sequelize.models.Account, { foreignKey: 'accountId' });
+    //Student.hasMany(sequelize.models.Grade, { foreignKey: 'student_id' });
     // Add any other associations as needed
   };
 

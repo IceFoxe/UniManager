@@ -10,6 +10,7 @@ const RegisterForm: React.FC = () => {
     const [password, setPassword] = useState('');
     const [repeatPassword, setRepeatPassword] = useState('');
     const [email, setEmail] = useState('');
+    const [role, setRole] = useState('');
     const [passwordError, setPasswordError] = useState('');
 
 
@@ -37,6 +38,9 @@ const RegisterForm: React.FC = () => {
             setPasswordError('');
         }
     };
+    const handleRoleChange = (e: any) => {
+         setRole(e.target.value);
+    };
 
     const handleRepeatPasswordChange = (e:any) => {
         const newRepeatPassword = e.target.value;
@@ -51,10 +55,11 @@ const RegisterForm: React.FC = () => {
     };
     const handleRegister = async () => {
         try {
-            const response = await axios.post('http://localhost:3001/register', {
+            const response = await axios.post('http://localhost:3000/api/register', {
                 username,
                 password,
-                email
+                email,
+                role
             });
             if (response.data.error) {
                 alert('register successful');
@@ -67,6 +72,7 @@ const RegisterForm: React.FC = () => {
         }
         setUsername('');
         setEmail('');
+        setRole('')
         setPassword('');
         setRepeatPassword('');
     };
@@ -96,6 +102,18 @@ const RegisterForm: React.FC = () => {
                 </div>
                 <h4></h4>
                 <div className={'input-container'}>
+                    <select
+                        id="role"
+                        value={role}
+                        onChange={handleRoleChange}
+                    >
+                        <option value="Student">Student</option>
+                        <option value="Professor">Professor</option>
+                        <option value="Worker">Worker</option>
+                    </select>
+                </div>
+                <h4></h4>
+                <div className={'input-container'}>
                     <input
                         type="password"
                         id="password"
@@ -113,7 +131,7 @@ const RegisterForm: React.FC = () => {
                         placeholder={"Repeat Password"}
                     />
                 </div>
-                {passwordError && <p style={{ color: 'red' }}>{passwordError}</p>}
+                {passwordError && <p style={{color: 'red'}}>{passwordError}</p>}
                 <button type="button" onClick={handleRegister}>
                     Sign Up
                 </button>
@@ -126,8 +144,8 @@ const RegisterForm: React.FC = () => {
                 </button>
             </form>
 
-            <h3>Already a member?  | <Link to="/auth/login">Sign In</Link></h3>
-            <h4> <a href={'../'}>Forgot Password</a></h4>
+            <h3>Already a member? | <Link to="/auth/login">Sign In</Link></h3>
+            <h4><a href={'../'}>Forgot Password</a></h4>
 
         </div>
     );

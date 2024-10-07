@@ -10,5 +10,6 @@ router.put('/accounts/:id', AccountController.updateAccount);
 router.delete('/accounts/:id', AccountController.deleteAccount);
 router.post('/login', AccountController.login);
 router.post('/accounts/:id/change-password', AccountController.changePassword);
+router.post('/register', AccountController.createAccount);
 
 module.exports = router;

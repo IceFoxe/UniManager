@@ -4,6 +4,7 @@ const StudentMapper = require('../mappers/StudentMapper');
 class StudentService {
   static async getAllStudents() {
     const students = await StudentDAO.findAll();
+    console.log("no student");
     return students.map(StudentMapper.toDTO);
   }
 

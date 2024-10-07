@@ -4,6 +4,7 @@ const authMiddleware = (req, res, next) => {
     const token = req.header('Authorization')?.replace('Bearer ', '');
 
     if (!token) {
+        console.log('No token provided');
         return res.status(401).json({ error: 'No token provided' });
     }
 
