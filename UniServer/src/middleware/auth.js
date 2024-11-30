@@ -1,6 +1,4 @@
-const jwt = require('jsonwebtoken');
-
-const authMiddleware = (req, res, next) => {
+const auth = (req, res, next) => {
     const token = req.header('Authorization')?.replace('Bearer ', '');
 
     if (!token) {
@@ -16,4 +14,13 @@ const authMiddleware = (req, res, next) => {
     }
 };
 
-module.exports = authMiddleware;
+const checkPermission = (requiredRole) => {
+    return (req, res, next) => {
+        if (!req.user || !req.user.roles.includes(requiredRole)) {
+            return res.status(403).json({ error: 'Insufficient permissions' });
+        }
+        next();
+    };
+};
+
+module.exports = { auth, checkPermission };

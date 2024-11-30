@@ -1,6 +1,5 @@
 const { Sequelize, DataTypes } = require('sequelize');
-const fs = require('fs');
-const path = require('path');
+const { applyExtraSetup } = require('./AdditionalSetup');
 
 const sequelize = new Sequelize('UniProj', 'Aver', 'pepsi', {
   host: 'localhost',
@@ -14,39 +13,33 @@ const sequelize = new Sequelize('UniProj', 'Aver', 'pepsi', {
   }
 });
 
-const models = {};
+const modelDefiners = [
+  require('../models/Account'),
+  require('../models/AuditLog'),
+  require('../models/Course'),
+  require('../models/Employee'),
+  require('../models/Faculty'),
+  require('../models/FacultyProgram'),
+  require('../models/Grade'),
+  require('../models/Professor'),
+  require('../models/Program'),
+  require('../models/Student')
+];
 
-const modelsDir = path.join(__dirname, '../EF/models');
-fs.readdirSync(modelsDir)
-  .filter(file => file.endsWith('.js'))
-  .forEach(file => {
-    const modelModule = require(path.join(modelsDir, file));
-    const model = modelModule.default || modelModule;
-    if (typeof model === 'function') {
-      const modelInstance = model(sequelize, DataTypes);
-      models[modelInstance.name] = modelInstance;
-    } else {
-      console.warn(`Model file ${file} does not export a function.`);
-    }
-  });
+for (const modelDefiner of modelDefiners) {
+	modelDefiner(sequelize);
+}
 
-Object.keys(models).forEach(modelName => {
-  if (models[modelName].associate) {
-    models[modelName].associate(models);
-  }
-});
+applyExtraSetup(sequelize);
 
 const initializeDatabase = async () => {
   try {
     await sequelize.authenticate();
     console.log('Connection has been established successfully.');
 
-    await sequelize.models.Student.sync();
-    console.log('STUDENT models were synchronized successfully.');
-    // Sync all models
     await sequelize.sync();
-
     console.log('All models were synchronized successfully.');
+
   } catch (error) {
     console.error('Unable to connect to the database:', error);
     throw error;
@@ -54,7 +47,7 @@ const initializeDatabase = async () => {
 };
 
 module.exports = {
+  models: sequelize.models,
   sequelize,
-  models,
   initializeDatabase
 };
