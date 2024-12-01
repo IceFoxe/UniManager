@@ -42,7 +42,7 @@ export const isTokenValid = (token?: string | null): boolean => {
 // Protected Route Component
 export const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const location = useLocation();
-  const token = localStorage.getItem('token'); // Adjust storage method as needed
+  const token = localStorage.getItem('authToken'); // Adjust storage method as needed
 
   // If no token or invalid token, redirect to login
   if (!isTokenValid(token)) {

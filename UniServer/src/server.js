@@ -4,6 +4,7 @@ const { initializeDatabase } = require('./config/db');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const authRoutes = require('./routes/authRoutes');
+require('dotenv').config({ path: '../.env' });
 async function startApp() {
     try {
         await initializeDatabase();

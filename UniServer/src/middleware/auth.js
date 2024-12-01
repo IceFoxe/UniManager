@@ -1,3 +1,4 @@
+const {verify} = require("jsonwebtoken");
 const auth = (req, res, next) => {
     const token = req.header('Authorization')?.replace('Bearer ', '');
 
@@ -7,7 +8,7 @@ const auth = (req, res, next) => {
     }
 
     try {
-        req.user = jwt.verify(token, process.env.JWT_SECRET);
+        req.user = verify(token, process.env.JWT_SECRET);
         next();
     } catch (error) {
         res.status(401).json({ error: 'Invalid token' });
@@ -16,7 +17,7 @@ const auth = (req, res, next) => {
 
 const checkPermission = (requiredRole) => {
     return (req, res, next) => {
-        if (!req.user || !req.user.roles.includes(requiredRole)) {
+        if (!req.user || !req.user.role ===requiredRole ) {
             return res.status(403).json({ error: 'Insufficient permissions' });
         }
         next();

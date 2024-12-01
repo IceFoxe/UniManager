@@ -2,7 +2,6 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const { Sequelize } = require('sequelize');  // Direct import from sequelize
 const { models } = require('../config/db');
-require('dotenv').config();
 class AuthController {
         async login(req, res) {
         const { login, password } = req.body;

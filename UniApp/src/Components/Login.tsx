@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './CompStyles/Login.css'
 import { Link, useNavigate } from 'react-router-dom'
 import axios from 'axios';
-
+import { isTokenValid } from '../authUtils.tsx'
 interface LoginResponse {
   token: string;
   user: {
@@ -23,6 +23,31 @@ const Login: React.FC = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
+        // Check for existing auth token
+        const token = localStorage.getItem('authToken');
+        const user = localStorage.getItem('user');
+
+        if (isTokenValid(token) && user) {
+            const userData = JSON.parse(user);
+            // Set default authorization header
+            axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+
+            // Redirect based on user role
+            switch (userData.role) {
+                case 'admin':
+                    navigate('/admin/dashboard');
+                    break;
+                case 'teacher':
+                    navigate('/teacher/dashboard');
+                    break;
+                case 'student':
+                    navigate('/student/dashboard');
+                    break;
+                default:
+                    navigate('/dashboard');
+            }
+        }
+
         const handleKeyPress = (event: KeyboardEvent) => {
             if (event.key === 'Enter') {
                 handleLogin();
@@ -33,7 +58,7 @@ const Login: React.FC = () => {
         return () => {
             document.removeEventListener('keydown', handleKeyPress);
         };
-    }, []);
+    }, [navigate]);
 
     const handleLogin = async () => {
         if (!username || !password) {
@@ -52,16 +77,10 @@ const Login: React.FC = () => {
 
             const { token, user } = response.data;
 
-            // Store token in localStorage
             localStorage.setItem('authToken', token);
-            
-            // Store user data in localStorage
             localStorage.setItem('user', JSON.stringify(user));
-
-            // Set authorization header for future requests
             axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 
-            // Redirect based on user role
             switch (user.role) {
                 case 'admin':
                     navigate('/admin/dashboard');
