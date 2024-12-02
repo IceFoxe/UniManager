@@ -14,8 +14,8 @@ import {
 } from '@mui/material';
 
 interface Grade {
-  grade: number;
-  course: string;
+  value: number;
+  course_id: string;
   createdAt: string;
 }
 
@@ -76,25 +76,25 @@ const GradesComponent: React.FC = () => {
   }
 
   return (
-    <Paper sx={{ maxWidth: 800, mx: 'auto', mt: 2, p: 2 }}>
+    <Paper sx={{ mx: 'auto', mt: 2, p: 2, background:  '#151515', boxShadow: '0', border: '1px solid rgba(255,255,255,0.1)'}}>
       <Typography variant="h5" component="h2" gutterBottom>
-        Student Grades
+        Oceny studenta
       </Typography>
 
       <TableContainer>
         <Table aria-label="grades table">
           <TableHead>
             <TableRow>
-              <TableCell><Typography variant="subtitle2">Course</Typography></TableCell>
-              <TableCell><Typography variant="subtitle2">Grade</Typography></TableCell>
-              <TableCell><Typography variant="subtitle2">Date</Typography></TableCell>
+              <TableCell><Typography variant="subtitle2">Kurs</Typography></TableCell>
+              <TableCell><Typography variant="subtitle2">Ocena</Typography></TableCell>
+              <TableCell><Typography variant="subtitle2">Data wystawienia</Typography></TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {grades.map((grade, index) => (
               <TableRow key={index} hover>
-                <TableCell>{grade.course}</TableCell>
-                <TableCell>{grade.grade}</TableCell>
+                <TableCell>{grade.course_id}</TableCell>
+                <TableCell>{grade.value}</TableCell>
                 <TableCell>{new Date(grade.createdAt).toLocaleDateString()}</TableCell>
               </TableRow>
             ))}

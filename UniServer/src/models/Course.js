@@ -7,15 +7,15 @@ module.exports = (sequelize) => {
             primaryKey: true,
             autoIncrement: true
         },
-        faculty_program_id: {
+        program_id: {
             type: DataTypes.INTEGER,
             allowNull: false,
             validate: {
                 notNull: {
-                    msg: 'Faculty program ID is required'
+                    msg: 'program ID is required'
                 },
                 isInt: {
-                    msg: 'Faculty program ID must be an integer'
+                    msg: 'program ID must be an integer'
                 }
             }
         },
@@ -129,7 +129,7 @@ module.exports = (sequelize) => {
                 fields: ['code']
             },
             {
-                fields: ['faculty_program_id']
+                fields: ['program_id']
             },
             {
                 fields: ['teacher_id']

@@ -20,7 +20,7 @@ module.exports = (sequelize) => {
                 }
             }
         },
-        accountId: {
+        employee_Id: {
             type: DataTypes.INTEGER,
             allowNull: false,
             unique: true,
@@ -77,7 +77,7 @@ module.exports = (sequelize) => {
         indexes: [
             {
                 unique: true,
-                fields: ['accountId']
+                fields: ['employee_Id']
             },
             {
                 fields: ['facultyId']

@@ -5,16 +5,16 @@ export const darkTheme = {
     mode: 'dark',
     primary: {
       main: '#5d2365',
-      dark: '#634f68',
+      dark: '#a352b1',
       light: '#81298FFF',
     },
     background: {
-      default: '#2e2d2d',
+      default: '#151515',
     }
   },
 } as const;
 
-export const drawerWidth = 80;
+export const drawerWidth = 74;
 export const subDrawerWidth = 240;
 
 export const styles = {
@@ -27,7 +27,6 @@ export const styles = {
       boxSizing: 'border-box',
       backgroundColor: 'background.paper',
       zIndex: 1300,
-      boxShadow: '4px 0px 10px rgba(0, 0, 0, 0.2)',
     },
   },
 
@@ -36,8 +35,14 @@ export const styles = {
     fontSize: 40,
     color: 'primary.main'
   },
-
+  submenuItem:{
+    borderRadius: '10px',
+    margin: '10px 10px 0 10px',
+    justifyContent: 'center',
+  },
   menuButton: {
+    borderRadius: '15px',
+    margin: '5px',
     justifyContent: 'center',
     minHeight: 64,
     '&.Mui-selected': {
@@ -54,18 +59,19 @@ export const styles = {
     flexShrink: 0,
     transition: 'width 0.3s ease-in-out',
     zIndex: 1200,
-    boxShadow: '4px 0px 10px rgba(0, 0, 0, 0.2)',
+    boxSizing: 'border-box',
     '& .MuiDrawer-paper': {
       width: subDrawerWidth,
       boxSizing: 'border-box',
       left: drawerWidth,
       backgroundColor: 'background.default',
-      borderRight: 'none',
       transform: isSubMenuOpen ? 'translateX(0)' : `translateX(-${subDrawerWidth}px)`,
       transition: 'transform 0.3s ease-in-out',
       zIndex: 1200,
     },
+
   }),
+
 
   toggleButton: (isSubMenuOpen: boolean) => ({
     position: 'fixed',

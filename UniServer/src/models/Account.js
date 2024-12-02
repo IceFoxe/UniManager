@@ -9,7 +9,6 @@ module.exports = (sequelize) => {
         },
         login: {
             type: DataTypes.STRING(50),
-            unique: true,
             allowNull: false,
             validate: {
                 notEmpty: {
@@ -27,7 +26,6 @@ module.exports = (sequelize) => {
         },
         email: {
             type: DataTypes.STRING,
-            unique: true,
             allowNull: false,
             validate: {
                 isEmail: {
@@ -91,7 +89,7 @@ module.exports = (sequelize) => {
             }
         },
         role: {
-            type: DataTypes.ENUM('student', 'employee', 'teacher', 'admin'),
+            type: DataTypes.ENUM('Student', 'Employee', 'Professor', 'Admin'),
             allowNull: false,
             validate: {
                 isIn: {

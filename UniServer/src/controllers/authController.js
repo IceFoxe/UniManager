@@ -14,7 +14,6 @@ class AuthController {
         }
 
         try {
-            // Find user by login or email without using Op
             const account = await models.Account.findOne({
                 where: Sequelize.literal(`(login = '${login}' OR email = '${login}')`)
             });
@@ -25,21 +24,17 @@ class AuthController {
                 });
             }
 
-            // Verify password
             const isValidPassword = await bcrypt.compare(password, account.password_hash);
-
             if (!isValidPassword) {
                 return res.status(401).json({
                     error: 'Invalid credentials'
                 });
             }
 
-            // Update last login
             await account.update({
                 last_login: new Date()
             });
 
-            // Generate JWT token
             const token = jwt.sign(
                 {
                     userId: account.account_id,
@@ -50,21 +45,13 @@ class AuthController {
                     lastName: account.last_name
                 },
                 process.env.JWT_SECRET,
-                { expiresIn: '24h' }
+                { expiresIn: '2h' }
             );
 
             // Return success response
             res.json({
                 message: 'Login successful',
                 token,
-                user: {
-                    id: account.account_id,
-                    login: account.login,
-                    email: account.email,
-                    role: account.role,
-                    firstName: account.first_name,
-                    lastName: account.last_name
-                }
             });
 
         } catch (error) {
