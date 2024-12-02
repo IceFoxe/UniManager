@@ -32,7 +32,7 @@ import ExpandMore from '@mui/icons-material/ExpandMore';
 import { darkTheme, styles } from './PageStyles/Dashboard.ts';
 
 // Import your components
-import Overview from '@/Components/views/Pulpit/Overview'
+import Overview from '../Components/views/Pulpit/Overview';
 import OverviewProfessor from '../Components/views/Pulpit/Prowadzacy/Overview';
 import OverviewEmployee from '../Components/views/Pulpit/Pracownik/AdminDashboard.tsx';
 import Performance from '../Components/views/Pulpit/Courses';
