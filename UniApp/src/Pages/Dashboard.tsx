@@ -152,8 +152,8 @@ const DashboardLayout: React.FC = () => {
     ],
     D: [
       { label: 'Widok Główny', key: 'overview', component: Overview },
-      { label: 'Kursy', key: 'performance', component: Performance },
-      { label: 'Oceny', key: 'metrics', component: Grades }
+      { label: 'Moje Kursy', key: 'performance', component: Performance },
+      { label: 'Moje Oceny', key: 'metrics', component: Grades }
     ],
     E: [
       { label: 'Widok Główny', key: 'overview', component: OverviewEmployee },
@@ -175,8 +175,8 @@ const DashboardLayout: React.FC = () => {
     ],
     K: [
       { label: 'Dane', key: 'data', component: UserData },
-      { label: 'Oceny', key: 'grades', component: Grades2 },
-      { label: 'Uprawnienia', key: 'permissions', component: Permissions }
+      { label: 'Wnioski', key: 'grades', component: Grades2 },
+      { label: 'Płatności', key: 'permissions', component: Permissions }
     ]
   };
 
@@ -222,7 +222,7 @@ const DashboardLayout: React.FC = () => {
         width: '100%',
         mb: 3,
         backgroundColor: 'transparent',
-        height: '10vw',
+        height: '10%',
       }}
     >
       <Box

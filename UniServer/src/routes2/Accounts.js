@@ -4,7 +4,7 @@ const { getIdParam } = require('../helpers');
 async function getAll(req, res) {
     try {
         const accounts = await models.Account.findAll({
-            attributes: { exclude: ['password_hash', 'ssn_hash'] }
+            attributes: { exclude: ['password_hash']}
         });
         res.status(200).json(accounts);
     } catch (error) {
@@ -16,7 +16,7 @@ async function getById(req, res) {
     try {
         const id = getIdParam(req);
         const account = await models.Account.findByPk(id, {
-            attributes: { exclude: ['password_hash', 'ssn_hash'] }
+            attributes: { exclude: ['password_hash'] }
         });
         if (account) {
             res.status(200).json(account);

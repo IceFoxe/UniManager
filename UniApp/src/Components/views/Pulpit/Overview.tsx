@@ -3,14 +3,15 @@ import {
   Box,
   Paper,
   Typography,
-
   List,
   ListItem,
   ListItemText,
-  Chip
+  Chip,
+  useTheme
 } from '@mui/material';
 import { format } from 'date-fns';
-import Schedule from './Schedule.tsx'
+import Schedule from './Schedule';
+
 interface Grade {
   subject: string;
   grade: number;
@@ -18,16 +19,15 @@ interface Grade {
   type: string;
 }
 
-
 const Overview: React.FC = () => {
-  // Example data - replace with actual API calls
+  const theme = useTheme();
+
   const recentGrades: Grade[] = [
     { subject: 'Mathematics', grade: 4.5, date: '2024-02-28', type: 'Exam' },
     { subject: 'Physics', grade: 5.0, date: '2024-02-25', type: 'Quiz' },
     { subject: 'Programming', grade: 4.0, date: '2024-02-20', type: 'Project' },
     { subject: 'English', grade: 4.5, date: '2024-02-18', type: 'Presentation' }
   ];
-
 
   const getGradeColor = (grade: number): string => {
     if (grade >= 4.5) return 'success';
@@ -37,40 +37,121 @@ const Overview: React.FC = () => {
   };
 
   return (
-    <Box sx={{ display: 'flex', gap: 3, flexWrap: 'wrap' }}>
+    <Box
+      sx={{
+        display: 'flex',
+        gap: 3,
+        flexWrap: 'wrap',
+        width: '100%',
+        height: '100%'
+      }}
+    >
       {/* Timetable Section */}
-      <Schedule/>
+      <Box
+        sx={{
+          flex: '1 1 auto',
+          maxWidth: '65%',
+          minWidth: '600px',
+          '@media (max-width: 1200px)': {
+            maxWidth: '100%'
+          }
+        }}
+      >
+        <Schedule />
+      </Box>
 
       {/* Recent Grades Section */}
-      <Box sx={{ flex: '1 1 300px', minWidth: 0 }}>
-        <Paper elevation={2} sx={{ p: 2, height: '100%' }}>
-          <Typography variant="h6" gutterBottom>
+      <Box
+        sx={{
+          flex: '1 1 300px',
+          minWidth: '300px',
+          maxWidth: '35%',
+          '@media (max-width: 1200px)': {
+            maxWidth: '100%'
+          }
+        }}
+      >
+        <Paper
+          elevation={0}
+          sx={{
+            p: 3,
+            height: '100%',
+            backgroundColor: theme.palette.background.paper,
+            borderRadius: 2
+          }}
+        >
+          <Typography
+            variant="h6"
+            gutterBottom
+            sx={{
+              fontWeight: 500,
+              mb: 3
+            }}
+          >
             Recent Grades
           </Typography>
-          <List>
+          <List sx={{ p: 0 }}>
             {recentGrades.map((grade, index) => (
               <ListItem
                 key={index}
                 divider={index !== recentGrades.length - 1}
-                sx={{ py: 2 }}
+                sx={{
+                  py: 2,
+                  px: 0,
+                  borderColor: theme.palette.mode === 'dark'
+                    ? 'rgba(255, 255, 255, 0.12)'
+                    : 'rgba(0, 0, 0, 0.12)'
+                }}
               >
                 <ListItemText
                   primary={
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <Typography variant="body1">{grade.subject}</Typography>
+                    <Box sx={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center'
+                    }}>
+                      <Typography
+                        variant="body1"
+                        sx={{
+                          color: theme.palette.text.primary,
+                          fontWeight: 500
+                        }}
+                      >
+                        {grade.subject}
+                      </Typography>
                       <Chip
-                        label={grade.grade}
+                        label={grade.grade.toFixed(1)}
                         color={getGradeColor(grade.grade) as any}
                         size="small"
+                        sx={{
+                          fontWeight: 500,
+                          minWidth: '45px'
+                        }}
                       />
                     </Box>
                   }
                   secondary={
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 1 }}>
-                      <Typography variant="caption" color="text.secondary">
+                    <Box sx={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      mt: 1
+                    }}>
+                      <Typography
+                        variant="caption"
+                        sx={{
+                          color: theme.palette.text.secondary,
+                          fontWeight: 400
+                        }}
+                      >
                         {grade.type}
                       </Typography>
-                      <Typography variant="caption" color="text.secondary">
+                      <Typography
+                        variant="caption"
+                        sx={{
+                          color: theme.palette.text.secondary,
+                          fontWeight: 400
+                        }}
+                      >
                         {format(new Date(grade.date), 'MMM dd, yyyy')}
                       </Typography>
                     </Box>

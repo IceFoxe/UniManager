@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Paper, Typography } from '@mui/material';
+import { Box, Paper, Typography, useTheme } from '@mui/material';
 
 interface ScheduleEvent {
   title: string;
@@ -11,10 +11,10 @@ interface ScheduleEvent {
 }
 
 const Schedule: React.FC = () => {
+  const theme = useTheme();
   const days = ['Poniedziałek', 'Wtorek', 'Środa', 'Czwartek', 'Piątek'];
   const hours = Array.from({ length: 13 }, (_, i) => i + 7); // 7:00 to 19:00
 
-  // Example schedule data
   const scheduleEvents: ScheduleEvent[] = [
     {
       title: 'Modelowanie i symulacja',
@@ -48,74 +48,131 @@ const Schedule: React.FC = () => {
     });
   };
 
+  const borderColor = theme.palette.mode === 'dark'
+    ? 'rgba(255, 255, 255, 0.12)'
+    : 'rgba(0, 0, 0, 0.12)';
+
+  const eventBgColor = theme.palette.mode === 'dark'
+    ? 'rgba(255, 255, 255, 0.05)'
+    : 'rgba(255, 255, 200, 0.5)';
+
   return (
-    <Paper elevation={2} sx={{ p: 2, overflowX: 'auto' }}>
-      <Typography variant="h6" gutterBottom>
-        Schedule
-      </Typography>
-      <Box sx={{ display: 'grid', gridTemplateColumns: '80px repeat(5, 1fr)', minWidth: 800 }}>
-        {/* Header row */}
+    <Box sx={{
+      display: 'flex',
+      flexDirection: 'column',
+      gap: 3,
+      width: '100%',
+      height: '100%',
+      overflow: 'hidden'
+    }}>
+      <Paper
+        elevation={0}
+        sx={{
+          p: 3,
+          overflowX: 'auto',
+          backgroundColor: theme.palette.background.paper,
+          borderRadius: 2
+        }}
+      >
         <Box sx={{
-          gridColumn: '1 / 2',
-          borderBottom: '1px solid rgba(224, 224, 224, 1)',
-          p: 1
+          display: 'grid',
+          gridTemplateColumns: '80px repeat(5, 1fr)',
+          minWidth: 800,
+          backgroundColor: theme.palette.background.paper
         }}>
-          Time
-        </Box>
-        {days.map(day => (
-          <Box key={day} sx={{
-            borderBottom: '1px solid rgba(224, 224, 224, 1)',
-            p: 1,
-            fontWeight: 'bold'
+          {/* Header row */}
+          <Box sx={{
+            gridColumn: '1 / 2',
+            borderBottom: `1px solid ${borderColor}`,
+            p: 1.5,
+            color: theme.palette.text.secondary
           }}>
-            {day}
+            Time
           </Box>
-        ))}
-
-        {/* Time slots */}
-        {hours.map(hour => (
-          <React.Fragment key={hour}>
-            {/* Time column */}
-            <Box sx={{
-              borderBottom: '1px solid rgba(224, 224, 224, 1)',
-              borderRight: '1px solid rgba(224, 224, 224, 1)',
-              p: 1,
-              height: '100px'
-            }}>
-              {`${hour}:00`}
+          {days.map(day => (
+            <Box
+              key={day}
+              sx={{
+                borderBottom: `1px solid ${borderColor}`,
+                p: 1.5,
+                fontWeight: 500,
+                color: theme.palette.text.primary
+              }}
+            >
+              {day}
             </Box>
+          ))}
 
-            {/* Day columns */}
-            {days.map(day => {
-              const event = getEventForTimeSlot(day, hour);
-              return (
-                <Box key={`${day}-${hour}`} sx={{
-                  borderBottom: '1px solid rgba(224, 224, 224, 1)',
-                  borderRight: '1px solid rgba(224, 224, 224, 1)',
-                  p: 1,
-                  backgroundColor: event ? 'rgba(255, 255, 200, 0.5)' : 'transparent',
-                  height: '100px'
-                }}>
-                  {event && (
-                    <Box>
-                      <Typography variant="subtitle2" sx={{ fontWeight: 'bold' }}>
-                        {event.title}
-                      </Typography>
-                      <Typography variant="caption" display="block">
-                        {event.location}
-                      </Typography>
-                      <Typography variant="caption" color="textSecondary">
-                        {`${event.startTime} - ${event.endTime}`}
-                      </Typography>
-                    </Box>
-                  )}
-                </Box>
-              );
-            })}
-          </React.Fragment>
-        ))}
-      </Box>
-    </Paper>
+          {/* Time slots */}
+          {hours.map(hour => (
+            <React.Fragment key={hour}>
+              {/* Time column */}
+              <Box sx={{
+                borderBottom: `1px solid ${borderColor}`,
+                borderRight: `1px solid ${borderColor}`,
+                p: 1.5,
+                height: '100px',
+                color: theme.palette.text.secondary
+              }}>
+                {`${hour.toString().padStart(2, '0')}:00`}
+              </Box>
+
+              {/* Day columns */}
+              {days.map(day => {
+                const event = getEventForTimeSlot(day, hour);
+                return (
+                  <Box
+                    key={`${day}-${hour}`}
+                    sx={{
+                      borderBottom: `1px solid ${borderColor}`,
+                      borderRight: `1px solid ${borderColor}`,
+                      p: 1.5,
+                      backgroundColor: event ? eventBgColor : 'transparent',
+                      height: '100px',
+                      transition: 'background-color 0.2s ease',
+                      '&:hover': {
+                        backgroundColor: event
+                          ? theme.palette.mode === 'dark'
+                            ? 'rgba(255, 255, 255, 0.08)'
+                            : 'rgba(255, 255, 200, 0.7)'
+                          : 'transparent'
+                      }
+                    }}
+                  >
+                    {event && (
+                      <Box>
+                        <Typography
+                          variant="subtitle2"
+                          sx={{
+                            fontWeight: 500,
+                            color: theme.palette.text.primary
+                          }}
+                        >
+                          {event.title}
+                        </Typography>
+                        <Typography
+                          variant="caption"
+                          display="block"
+                          sx={{ color: theme.palette.text.secondary }}
+                        >
+                          {event.location}
+                        </Typography>
+                        <Typography
+                          variant="caption"
+                          sx={{ color: theme.palette.text.disabled }}
+                        >
+                          {`${event.startTime} - ${event.endTime}`}
+                        </Typography>
+                      </Box>
+                    )}
+                  </Box>
+                );
+              })}
+            </React.Fragment>
+          ))}
+        </Box>
+      </Paper>
+    </Box>
   );
 };
 
