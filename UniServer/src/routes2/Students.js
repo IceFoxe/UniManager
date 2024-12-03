@@ -1,6 +1,105 @@
 const { models } = require('../config/db');
 const { getIdParam } = require('../helpers');
 
+async function searchStudents(req, res) {
+    try {
+        const {
+            facultyId,
+            search,            // For student name/code search
+            programId,         // Optional program filter
+            year,             // Optional year filter
+            page = 1,
+            limit = 10
+        } = req.query;
+
+        const queryOptions = {
+            include: [{
+                model: models.Program,
+                required: true,         // Inner join
+                where: {
+                    faculty_id: facultyId
+                },
+                include: [{
+                    model: models.Faculty,
+                    required: true
+                }]
+            }],
+            where: {},
+            order: [['student_code', 'ASC']],
+            limit: parseInt(limit),
+            offset: (page - 1) * parseInt(limit)
+        };
+
+        // Add search condition if provided
+        if (search) {
+            queryOptions.where = {
+                [Op.or]: [
+                    { student_code: { [Op.like]: `%${search}%` } },
+                    { first_name: { [Op.like]: `%${search}%` } },
+                    { last_name: { [Op.like]: `%${search}%` } }
+                ]
+            };
+        }
+
+        // Add program filter if provided
+        if (programId) {
+            queryOptions.include[0].where.program_id = programId;
+        }
+
+        // Add year filter if provided
+        if (year) {
+            queryOptions.where.year = year;
+        }
+
+        const students = await models.Student.findAndCountAll(queryOptions);
+
+        res.status(200).json({
+            data: students.rows,
+            metadata: {
+                total: students.count,
+                page: parseInt(page),
+                totalPages: Math.ceil(students.count / limit),
+                limit: parseInt(limit)
+            }
+        });
+
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+}
+
+// If you need more specific queries, you could add endpoints like:
+async function getStudentsByFaculty(req, res) {
+    try {
+        const { facultyId } = req.params;
+        const students = await models.Student.findAll({
+            include: [{
+                model: models.Program,
+                required: true,
+                where: {
+                    faculty_id: facultyId
+                },
+                attributes: ['program_name', 'program_code']  // Select specific fields
+            }],
+            attributes: [
+                'student_id',
+                'student_code',
+                'first_name',
+                'last_name',
+                'year'
+            ]
+        });
+
+        res.status(200).json(students);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+}
+
+module.exports = {
+    searchStudents,
+    getStudentsByFaculty
+};
 async function getAll(req, res) {
     try {
         console.log(`Received a ${req.method} request to ${req.url} XD`);
