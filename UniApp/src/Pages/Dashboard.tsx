@@ -33,6 +33,7 @@ import { darkTheme, styles } from './PageStyles/Dashboard.ts';
 
 // Import your components
 import Overview from '../Components/views/Pulpit/Overview';
+import StudentSearch from '../Components/utility/StudentSearch.tsx';
 import OverviewProfessor from '../Components/views/Pulpit/Prowadzacy/Overview';
 import OverviewEmployee from '../Components/views/Pulpit/Pracownik/AdminDashboard.tsx';
 import Performance from '../Components/views/Pulpit/Courses';
@@ -158,6 +159,7 @@ const DashboardLayout: React.FC = () => {
     E: [
       { label: 'Widok Główny', key: 'overview', component: OverviewEmployee },
       { label: 'Użytkownicy', key: 'tasks', component: Performance },
+      { label: 'Studenci', key: 'users', component: StudentSearch },
       { label: 'Wydziały', key: 'reports', component: Grades },
       { label: 'Kierunki', key: 'kierunki', component: Grades },
       { label: 'Kursy', key: 'kursy', component: Grades },

@@ -1,7 +1,7 @@
 // middleware/auth.js
 
 const jwt = require('jsonwebtoken');
-const { getById } = require('../models/Account'); // Assuming you have a User model
+const { getById } = require('../DbModels/Account'); // Assuming you have a User model
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key'; // Use environment variable in production
 
