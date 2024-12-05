@@ -1,87 +1,41 @@
-const { DataTypes } = require('sequelize');
+class Professor {
+    static ACADEMIC_TITLES = ['Assistant Professor', 'Associate Professor', 'Full Professor'];
 
-module.exports = (sequelize) => {
-    sequelize.define('Professor', {
-        id: {
-            type: DataTypes.INTEGER,
-            allowNull: false,
-            primaryKey: true,
-            autoIncrement: true
-        },
-        facultyId: {
-            type: DataTypes.INTEGER,
-            allowNull: false,
-            validate: {
-                notNull: {
-                    msg: 'Faculty ID is required'
-                },
-                isInt: {
-                    msg: 'Faculty ID must be an integer'
-                }
-            }
-        },
-        employee_Id: {
-            type: DataTypes.INTEGER,
-            allowNull: false,
-            unique: true,
-            validate: {
-                notNull: {
-                    msg: 'Account ID is required'
-                },
-                isInt: {
-                    msg: 'Account ID must be an integer'
-                }
-            }
-        },
-        academicTitle: {
-            type: DataTypes.ENUM('Assistant Professor', 'Associate Professor', 'Full Professor'),
-            allowNull: false,
-            defaultValue: 'Assistant Professor',
-            validate: {
-                notNull: {
-                    msg: 'Academic title is required'
-                },
-                isIn: {
-                    args: [['Assistant Professor', 'Associate Professor', 'Full Professor']],
-                    msg: 'Invalid academic title'
-                }
-            }
-        },
-        officeRoom: {
-            type: DataTypes.STRING(20),
-            validate: {
-                len: {
-                    args: [1, 20],
-                    msg: 'Office room must be between 1 and 20 characters'
-                },
-                is: {
-                    args: /^[A-Z0-9-]+$/,
-                    msg: 'Office room can only contain uppercase letters, numbers, and hyphens'
-                }
-            }
-        },
-        createdAt: {
-            type: DataTypes.DATE,
-            allowNull: false,
-            defaultValue: DataTypes.NOW,
-            validate: {
-                isDate: {
-                    msg: 'Created at must be a valid date'
-                }
-            }
-        },
+    constructor(data) {
+        this.id = data.id;
+        this.facultyId = data.facultyId;
+        this.employee_Id = data.employee_Id;
+        this.academicTitle = data.academicTitle || 'Assistant Professor';
+        this.officeRoom = data.officeRoom;
+        this.createdAt = data.createdAt || new Date();
+    }
 
-    }, {
-        tableName: 'Professors',
-        timestamps: true,
-        indexes: [
-            {
-                unique: true,
-                fields: ['employee_Id']
-            },
-            {
-                fields: ['facultyId']
-            },
-        ],
-    });
-};
+    validate() {
+        if (!this.facultyId || !Number.isInteger(this.facultyId)) {
+            throw new Error('Invalid faculty ID');
+        }
+        if (!this.employee_Id || !Number.isInteger(this.employee_Id)) {
+            throw new Error('Invalid employee ID');
+        }
+        if (!Professor.ACADEMIC_TITLES.includes(this.academicTitle)) {
+            throw new Error('Invalid academic title');
+        }
+        if (this.officeRoom && !/^[A-Z0-9-]+$/.test(this.officeRoom)) {
+            throw new Error('Invalid office room format');
+        }
+        return true;
+    }
+
+    toJSON() {
+        return {
+            id: this.id,
+            facultyId: this.facultyId,
+            employee_Id: this.employee_Id,
+            academicTitle: this.academicTitle,
+            officeRoom: this.officeRoom,
+            createdAt: this.createdAt
+        };
+    }
+}
+
+module.exports = Professor;

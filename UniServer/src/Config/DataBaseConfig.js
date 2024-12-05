@@ -19,7 +19,6 @@ const modelDefiners = [
   require('../DbModels/Course'),
   require('../DbModels/Employee'),
   require('../DbModels/Faculty'),
-  require('../DbModels/FacultyProgram'),
   require('../DbModels/Grade'),
   require('../DbModels/Professor'),
   require('../DbModels/Program'),

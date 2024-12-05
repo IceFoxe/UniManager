@@ -1,144 +1,130 @@
-const { DataTypes } = require('sequelize');
+// models/AuditLog.js
 
-module.exports = (sequelize) => {
-    sequelize.define('AuditLog', {
-        log_id: {
-            type: DataTypes.INTEGER,
-            primaryKey: true,
-            autoIncrement: true
-        },
-        account_id: {
-            type: DataTypes.INTEGER,
-            allowNull: false,
-            validate: {
-                isInt: {
-                    msg: 'Account ID must be an integer'
-                },
-                notNull: {
-                    msg: 'Account ID is required'
-                }
+class AuditLog {
+    /**
+     * @param {Object} data
+     * @param {number} [data.log_id]
+     * @param {number} data.account_id
+     * @param {Date} [data.timestamp]
+     * @param {string} [data.action]
+     * @param {string} [data.table_name]
+     * @param {number} [data.record_id]
+     * @param {string} [data.old_values]
+     * @param {string} [data.new_values]
+     * @param {string} [data.ip_address]
+     * @param {string} [data.user_agent]
+     * @param {Date} [data.created_at]
+     */
+    constructor(data) {
+        this.log_id = data.log_id;
+        this.account_id = data.account_id;
+        this.timestamp = data.timestamp || new Date();
+        this.action = data.action;
+        this.table_name = data.table_name;
+        this.record_id = data.record_id;
+        this.old_values = data.old_values;
+        this.new_values = data.new_values;
+        this.ip_address = data.ip_address;
+        this.user_agent = data.user_agent;
+        this.created_at = data.created_at || new Date();
+    }
+
+    /**
+     * @readonly
+     * @type {string[]}
+     */
+    static get VALID_ACTIONS() {
+        return ['CREATE', 'UPDATE', 'DELETE', 'LOGIN', 'LOGOUT', 'OTHER'];
+    }
+
+    /**
+     * @param {string} action
+     * @returns {boolean}
+     */
+    static isValidAction(action) {
+        return AuditLog.VALID_ACTIONS.includes(action);
+    }
+
+    /**
+     * @param {Object} oldValues
+     * @param {Object} newValues
+     * @returns {boolean}
+     */
+    hasChanges(oldValues, newValues) {
+        return JSON.stringify(oldValues) !== JSON.stringify(newValues);
+    }
+
+    /**
+     * @returns {Object}
+     */
+    toJSON() {
+        return {
+            log_id: this.log_id,
+            account_id: this.account_id,
+            timestamp: this.timestamp,
+            action: this.action,
+            table_name: this.table_name,
+            record_id: this.record_id,
+            old_values: this.old_values ? JSON.parse(this.old_values) : null,
+            new_values: this.new_values ? JSON.parse(this.new_values) : null,
+            ip_address: this.ip_address,
+            user_agent: this.user_agent,
+            created_at: this.created_at
+        };
+    }
+
+    /**
+     * @returns {string}
+     */
+    getChangeSummary() {
+        if (!this.old_values || !this.new_values) {
+            return '';
+        }
+
+        const oldObj = JSON.parse(this.old_values);
+        const newObj = JSON.parse(this.new_values);
+        const changes = [];
+
+        for (const key in newObj) {
+            if (oldObj[key] !== newObj[key]) {
+                changes.push(`${key}: ${oldObj[key]} → ${newObj[key]}`);
             }
-        },
-        timestamp: {
-            type: DataTypes.DATE,
-            allowNull: true,
-            validate: {
-                isDate: {
-                    msg: 'Timestamp must be a valid date'
-                }
+        }
+
+        return changes.join(', ');
+    }
+
+    /**
+     * @param {Object} data
+     * @returns {boolean}
+     */
+    validate() {
+        if (!this.account_id) {
+            throw new Error('Account ID is required');
+        }
+
+        if (this.action && !AuditLog.isValidAction(this.action)) {
+            throw new Error('Invalid action type');
+        }
+
+        if (this.old_values) {
+            try {
+                JSON.parse(this.old_values);
+            } catch (e) {
+                throw new Error('Invalid old_values JSON format');
             }
-        },
-        action: {
-            type: DataTypes.STRING(100),
-            allowNull: true,
-            validate: {
-                len: {
-                    args: [1, 100],
-                    msg: 'Action must be between 1 and 100 characters'
-                },
-                isIn: {
-                    args: [['CREATE', 'UPDATE', 'DELETE', 'LOGIN', 'LOGOUT', 'OTHER']],
-                    msg: 'Invalid action type'
-                }
+        }
+
+        if (this.new_values) {
+            try {
+                JSON.parse(this.new_values);
+            } catch (e) {
+                throw new Error('Invalid new_values JSON format');
             }
-        },
-        table_name: {
-            type: DataTypes.STRING(100),
-            allowNull: true,
-            validate: {
-                len: {
-                    args: [1, 100],
-                    msg: 'Table name must be between 1 and 100 characters'
-                },
-                is: {
-                    args: /^[a-zA-Z_][a-zA-Z0-9_]*$/,
-                    msg: 'Table name must contain only letters, numbers, and underscores, and start with a letter or underscore'
-                }
-            }
-        },
-        record_id: {
-            type: DataTypes.INTEGER,
-            allowNull: true,
-            validate: {
-                isInt: {
-                    msg: 'Record ID must be an integer'
-                }
-            }
-        },
-        old_values: {
-            type: DataTypes.TEXT,
-            allowNull: true,
-            validate: {
-                isValidJSON(value) {
-                    if (value) {
-                        try {
-                            JSON.parse(value);
-                        } catch (e) {
-                            throw new Error('Old values must be valid JSON');
-                        }
-                    }
-                }
-            }
-        },
-        new_values: {
-            type: DataTypes.TEXT,
-            allowNull: true,
-            validate: {
-                isValidJSON(value) {
-                    if (value) {
-                        try {
-                            JSON.parse(value);
-                        } catch (e) {
-                            throw new Error('New values must be valid JSON');
-                        }
-                    }
-                }
-            }
-        },
-        ip_address: {
-            type: DataTypes.STRING(45), // Support for IPv6 addresses
-            allowNull: true,
-            validate: {
-                isIP: {
-                    msg: 'Must be a valid IP address'
-                }
-            }
-        },
-        user_agent: {
-            type: DataTypes.STRING(255),
-            allowNull: true,
-            validate: {
-                len: {
-                    args: [0, 255],
-                    msg: 'User agent must not exceed 255 characters'
-                }
-            }
-        },
-        created_at: {
-            type: DataTypes.DATE,
-            defaultValue: DataTypes.NOW,
-            validate: {
-                isDate: {
-                    msg: 'Created at must be a valid date'
-                }
-            }
-        },
-    }, {
-        tableName: 'audit_logs',
-        timestamps: false,
-        indexes: [
-            {
-                fields: ['account_id']
-            },
-            {
-                fields: ['timestamp']
-            },
-            {
-                fields: ['action']
-            },
-            {
-                fields: ['table_name', 'record_id']
-            }
-        ]
-    });
-};
+        }
+
+        return true;
+    }
+}
+
+module.exports = AuditLog;

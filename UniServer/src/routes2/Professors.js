@@ -1,4 +1,4 @@
-const { models } = require('../config/db');
+const { models } = require('../Config/DataBaseConfig');
 const { getIdParam } = require('../helpers');
 
 async function getAll(req, res) {

@@ -1,13 +1,15 @@
 const express = require('express');
-const StudentController = require('../EF/controllers/StudentController');
-
 const router = express.Router();
+const StudentController = require('../controllers/studentController');
+const StudentService = require('../services/studentService');
+const StudentRepository = require('../repositories/StudentRepository');
 
-router.get('/students', StudentController.getAllStudents);
-router.get('/students/:id', StudentController.getStudentById);
-router.get('/students/number/:studentNumber', StudentController.getStudentByStudentNumber);
-router.post('/students', StudentController.createStudent);
-router.put('/students/:id', StudentController.updateStudent);
-router.delete('/students/:id', StudentController.deleteStudent);
+module.exports = (sequelize) => {
+    const studentRepository = new StudentRepository(sequelize);
+    const studentService = new StudentService(studentRepository);
+    const studentController = new StudentController(studentService);
 
-module.exports = router;
+    router.get('/', (req, res) => studentController.getStudents(req, res));
+    router.get('/:id', (req, res) => studentController.getStudentById(req, res));
+    return router;
+};
