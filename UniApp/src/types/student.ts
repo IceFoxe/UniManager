@@ -1,19 +1,19 @@
-// types/student.ts
-export interface Student {
+
+export interface Program {
   id: string;
-  studentCode: string;
-  fullName: string;
-  facultyName: string;
-  programName: string;
-  academicStanding: string;
-  enrollmentStatus: string;
-  advisor?: string;
+  name: string;
+  facultyId: string;
+  duration: number;
+  degree: string;
 }
+
 
 export interface Faculty {
   id: string;
   name: string;
+  programs?: Program[];
 }
+
 
 export interface SearchParams {
   name: string;
@@ -28,6 +28,23 @@ export interface SearchMetadata {
   totalPages: number;
   page: number;
   limit: number;
+}
+
+export interface Student {
+  id: string;
+  firstName: string;
+  lastName: string;
+  fullName: string;
+  studentCode: string;
+  facultyId: string;
+  facultyName: string;
+  programId: string;
+  programName: string;
+  academicStanding?: string;
+  semester: number;
+  status: 'ACTIVE' | 'SUSPENDED';
+  enrollmentDate: Date | null;
+  expectedGraduationDate: Date | null;
 }
 
 export interface SearchResponse {

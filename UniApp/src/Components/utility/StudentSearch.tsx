@@ -1,4 +1,3 @@
-// components/StudentList.tsx
 import React, { useState, useCallback } from 'react';
 import { Student, Faculty, SearchParams, SearchMetadata } from '../../types/student';
 import studentApi from '../../services/studentApi';
@@ -25,12 +24,24 @@ import {
   SelectChangeEvent,
   Dialog,
   DialogContent,
-  IconButton
+  IconButton,
+  Button
 } from '@mui/material';
-import { Close as CloseIcon } from '@mui/icons-material';
+import { Close as CloseIcon, Add as AddIcon } from '@mui/icons-material';
 import { debounce } from 'lodash';
 import StudentDetails from '../EntityViews/Uneditables/Student';
-
+import StudentForm from '../EntityViews/Forms/Student';
+interface StudentFormData {
+  firstName: string;
+  lastName: string;
+  studentNumber: string;
+  facultyId: string;
+  programId: string;
+  semester: number;
+  status: 'ACTIVE' | 'SUSPENDED';
+  enrollmentDate: Date | null;
+  expectedGraduationDate: Date | null;
+}
 const INITIAL_SEARCH_PARAMS: SearchParams = {
   name: '',
   facultyId: '',
@@ -54,7 +65,7 @@ const StudentList: React.FC = () => {
   const [faculties, setFaculties] = useState<Faculty[]>([]);
   const [selectedStudentId, setSelectedStudentId] = useState<string | null>(null);
   const [metadata, setMetadata] = useState<SearchMetadata>(INITIAL_METADATA);
-
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const performSearch = useCallback(
     debounce(async (params: SearchParams): Promise<void> => {
       try {
@@ -64,7 +75,7 @@ const StudentList: React.FC = () => {
         setStudents(result.data);
         setMetadata(result.metadata);
       } catch (err) {
-        setError('Search failed. Please try again.');
+        setError('Wyszukiwanie nie powiodło się. Spróbuj ponownie.');
         console.error('Search error:', err);
       } finally {
         setLoading(false);
@@ -79,7 +90,7 @@ const StudentList: React.FC = () => {
         const data = await studentApi.getFaculties();
         setFaculties(data);
       } catch (err) {
-        setError('Failed to load faculties');
+        setError('Nie udało się załadować wydziałów');
         console.error('Faculty loading error:', err);
       }
     };
@@ -115,45 +126,139 @@ const StudentList: React.FC = () => {
     performSearch(newParams);
   };
 
+  const handleAddStudent = async (studentData: StudentFormData) => {
+    try {
+      setLoading(true);
+      await studentApi.createStudent({
+        ...studentData,
+        studentCode: studentData.studentNumber // mapping to match API expectations
+      });
+      setIsAddDialogOpen(false);
+      performSearch(searchParams);
+    } catch (err) {
+      setError('Nie udało się utworzyć studenta');
+      console.error('Create student error:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+  const handleCloseAddDialog = () => {
+    setIsAddDialogOpen(false);
+    setError(null);
+  };
+
+  const handleCloseDetailsDialog = () => {
+    setSelectedStudentId(null);
+    setError(null);
+  };
+
+  const renderSearchBar = () => (
+    <Box sx={{ display: 'flex', gap: 2, mb: 3, flexWrap: 'wrap' }}>
+      <FormControl sx={{ minWidth: 200 }}>
+        <InputLabel>Wydział</InputLabel>
+        <Select
+          value={searchParams.facultyId}
+          label="Wydział"
+          onChange={handleSelectChange}
+        >
+          <MenuItem value="">Wszystkie wydziały</MenuItem>
+          {faculties.map((faculty) => (
+            <MenuItem key={faculty.id} value={faculty.id}>
+              {faculty.name}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+
+      <TextField
+        label="Imię i Nazwisko"
+        value={searchParams.name}
+        onChange={handleTextFieldChange('name')}
+        sx={{ minWidth: 200 }}
+      />
+
+      <TextField
+        label="Indeks studenta"
+        value={searchParams.studentCode}
+        onChange={handleTextFieldChange('studentCode')}
+        sx={{ minWidth: 200 }}
+      />
+    </Box>
+  );
+
+  const renderTable = () => (
+    <TableContainer component={Paper}>
+      <Table>
+        <TableHead>
+          <TableRow>
+            <TableCell>Numer Indeksu</TableCell>
+            <TableCell>Imię i Nazwisko</TableCell>
+            <TableCell>Program Studiów</TableCell>
+            <TableCell>Status</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {loading ? (
+            <TableRow>
+              <TableCell colSpan={4} align="center" sx={{ py: 3 }}>
+                <CircularProgress />
+              </TableCell>
+            </TableRow>
+          ) : students.length === 0 ? (
+            <TableRow>
+              <TableCell colSpan={4} align="center" sx={{ py: 3 }}>
+                Nie znaleziono studentów
+              </TableCell>
+            </TableRow>
+          ) : (
+            students.map((student) => (
+              <TableRow
+                key={student.id}
+                onClick={() => setSelectedStudentId(student.id)}
+                sx={{
+                  cursor: 'pointer',
+                  '&:hover': {
+                    backgroundColor: 'rgba(0, 0, 0, 0.04)',
+                  },
+                  transition: 'background-color 0.2s ease',
+                }}
+              >
+                <TableCell>{student.studentCode}</TableCell>
+                <TableCell>{student.fullName}</TableCell>
+                <TableCell>{student.programName}</TableCell>
+                <TableCell>{student.academicStanding}</TableCell>
+              </TableRow>
+            ))
+          )}
+        </TableBody>
+      </Table>
+    </TableContainer>
+  );
+
   return (
-    <Box sx={{ maxWidth: 1200, margin: '0 auto', p: 3 }}>
+    <Box sx={{ margin: '0 auto', p: 3 }}>
       <Card>
         <CardContent>
-          <Typography variant="h5" gutterBottom>
-            Student Search
-          </Typography>
-
-          <Box sx={{ display: 'flex', gap: 2, mb: 3, flexWrap: 'wrap' }}>
-            <FormControl sx={{ minWidth: 200 }}>
-              <InputLabel>Faculty</InputLabel>
-              <Select
-                value={searchParams.facultyId}
-                label="Faculty"
-                onChange={handleSelectChange}
-              >
-                <MenuItem value="">All Faculties</MenuItem>
-                {faculties.map((faculty) => (
-                  <MenuItem key={faculty.id} value={faculty.id}>
-                    {faculty.name}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-
-            <TextField
-              label="Student Name"
-              value={searchParams.name}
-              onChange={handleTextFieldChange('name')}
-              sx={{ minWidth: 200 }}
-            />
-
-            <TextField
-              label="Student Code"
-              value={searchParams.studentCode}
-              onChange={handleTextFieldChange('studentCode')}
-              sx={{ minWidth: 200 }}
-            />
+          <Box sx={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            mb: 3
+          }}>
+            <Typography variant="h4" sx={{ margin: '5px 10px 25px 5px' }}>
+              Wyszukaj Studenta
+            </Typography>
+            <Button
+              variant="contained"
+              startIcon={<AddIcon />}
+              onClick={() => setIsAddDialogOpen(true)}
+              sx={{ height: 40 }}
+            >
+              Dodaj Studenta
+            </Button>
           </Box>
+
+          {renderSearchBar()}
 
           {error && (
             <Alert severity="error" sx={{ mb: 2 }}>
@@ -161,54 +266,7 @@ const StudentList: React.FC = () => {
             </Alert>
           )}
 
-          <TableContainer component={Paper}>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell>Student Code</TableCell>
-                  <TableCell>Name</TableCell>
-                  <TableCell>Faculty</TableCell>
-                  <TableCell>Program</TableCell>
-                  <TableCell>Academic Standing</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {loading ? (
-                  <TableRow>
-                    <TableCell colSpan={5} align="center" sx={{ py: 3 }}>
-                      <CircularProgress />
-                    </TableCell>
-                  </TableRow>
-                ) : students.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={5} align="center" sx={{ py: 3 }}>
-                      No students found
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  students.map((student) => (
-                    <TableRow
-                      key={student.id}
-                      onClick={() => setSelectedStudentId(student.id)}
-                      sx={{
-                        cursor: 'pointer',
-                        '&:hover': {
-                          backgroundColor: 'rgba(0, 0, 0, 0.04)',
-                        },
-                        transition: 'background-color 0.2s ease',
-                      }}
-                    >
-                      <TableCell>{student.studentCode}</TableCell>
-                      <TableCell>{student.fullName}</TableCell>
-                      <TableCell>{student.facultyName}</TableCell>
-                      <TableCell>{student.programName}</TableCell>
-                      <TableCell>{student.academicStanding}</TableCell>
-                    </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          </TableContainer>
+          {renderTable()}
 
           {metadata.totalPages > 1 && (
             <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
@@ -225,13 +283,13 @@ const StudentList: React.FC = () => {
 
       <Dialog
         open={!!selectedStudentId}
-        onClose={() => setSelectedStudentId(null)}
+        onClose={handleCloseDetailsDialog}
         maxWidth="md"
         fullWidth
       >
         <DialogContent sx={{ position: 'relative', p: 3 }}>
           <IconButton
-            onClick={() => setSelectedStudentId(null)}
+            onClick={handleCloseDetailsDialog}
             sx={{
               position: 'absolute',
               right: 8,
@@ -246,6 +304,31 @@ const StudentList: React.FC = () => {
           )}
         </DialogContent>
       </Dialog>
+
+      <Dialog
+      open={isAddDialogOpen}
+      onClose={handleCloseAddDialog}
+      maxWidth="md"
+      fullWidth
+    >
+      <DialogContent sx={{ position: 'relative', p: 3 }}>
+        <IconButton
+          onClick={handleCloseAddDialog}
+          sx={{
+            position: 'absolute',
+            right: 8,
+            top: 8,
+            zIndex: 1
+          }}
+        >
+          <CloseIcon />
+        </IconButton>
+        <StudentForm
+          onSubmit={handleAddStudent}
+          onClose={handleCloseAddDialog}
+        />
+      </DialogContent>
+    </Dialog>
     </Box>
   );
 };
