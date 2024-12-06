@@ -2,21 +2,21 @@
   "development": {
     "username": "aver",
     "password": "pepsi",
-    "database": "UniProj",
+    "database": "UniProject",
     "host": "127.0.0.1",
     "dialect": "mssql"
   },
   "test": {
     "username": "aver",
     "password": "pepsi",
-    "database": "UniProj",
+    "database": "UniProject",
     "host": "127.0.0.1",
     "dialect": "mssql"
   },
   "production": {
     "username": "aver",
     "password": "pepsi",
-    "database": "UniProj",
+    "database": "UniProject",
     "host": "127.0.0.1",
     "dialect": "mssql"
   }
