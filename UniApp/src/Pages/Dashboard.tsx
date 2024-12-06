@@ -31,7 +31,6 @@ import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import { darkTheme, styles } from './PageStyles/Dashboard.ts';
 
-// Import your components
 import Overview from '../Components/views/Pulpit/Overview';
 import StudentSearch from '../Components/utility/StudentSearch.tsx';
 import OverviewProfessor from '../Components/views/Pulpit/Prowadzacy/Overview';
@@ -51,7 +50,7 @@ import Permissions from '../Components/views/Konto/Permissions';
 type MainMenuKey = 'D' | 'A' | 'S' | 'K' | 'P' | 'E';
 
 interface User {
-  role: 'student' | 'professor' | 'employee';
+  role: 'student' | 'professor' | 'admin';
 }
 
 type SubMenuItem = {
@@ -84,7 +83,6 @@ const DashboardLayout: React.FC = () => {
           const decodedToken = JSON.parse(atob(token.split('.')[1]));
           setUser({ role: decodedToken.role });
             console.log(decodedToken.role);
-          // Set initial active menu based on role
           switch (decodedToken.role) {
             case 'Professor':
               setActiveMenu('P');
@@ -96,7 +94,7 @@ const DashboardLayout: React.FC = () => {
               setActiveMenu('E');
               break;
             default:
-              window.location.href = '/login';
+              console.error('Error decoding token:', decodedToken.role);
           }
         } catch (error) {
           console.error('Error decoding token:', error);

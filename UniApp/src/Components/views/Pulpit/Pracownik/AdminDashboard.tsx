@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import {
   Box,
-  Typography,
   Button,
   Dialog,
   DialogTitle,
@@ -50,12 +49,7 @@ interface StudentInfo {
   status: 'active' | 'inactive';
 }
 
-interface Faculty {
-  id?: number;
-  name: string;
-  code: string;
-  description: string;
-}
+
 
 interface Program {
   id?: number;
@@ -67,15 +61,6 @@ interface Program {
   description: string;
 }
 
-interface Course {
-  id?: number;
-  name: string;
-  code: string;
-  facultyId: number;
-  credits: number;
-  description: string;
-  semester?: number;
-}
 
 const AdminDashboard = () => {
   // Tab state
@@ -119,7 +104,7 @@ const AdminDashboard = () => {
   ];
 
   // Handler functions
-  const handleTabChange = (event: React.SyntheticEvent, newValue: number)  => {
+  const handleTabChange = (_event: React.SyntheticEvent, newValue: number)  => {
     setCurrentTab(newValue);
   };
 
@@ -140,7 +125,7 @@ const AdminDashboard = () => {
         severity: 'success'
       });
       handleCloseDialog(type);
-    } catch (error) {
+    } catch {
       setSnackbar({
         open: true,
         message: `Error creating ${type}`,

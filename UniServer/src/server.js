@@ -1,6 +1,6 @@
 const express = require('express');
 const authMiddleware = require('./middleware/auth');
-const { initializeDatabase } = require('./config/db');
+const { initializeDatabase } = require('./config/DataBaseConfig');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const authRoutes = require('./routes/authRoutes');

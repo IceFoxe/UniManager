@@ -12,7 +12,6 @@ export const isTokenValid = (token?: string | null): boolean => {
   if (!token) return false;
 
   try {
-    // Manual token parsing (base64 decode)
     const [, payloadBase64] = token.split('.');
     if (!payloadBase64) return false;
 
@@ -39,12 +38,10 @@ export const isTokenValid = (token?: string | null): boolean => {
   }
 };
 
-// Protected Route Component
 export const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const location = useLocation();
   const token = localStorage.getItem('authToken'); // Adjust storage method as needed
 
-  // If no token or invalid token, redirect to login
   if (!isTokenValid(token)) {
     return <Navigate
       to="/login"

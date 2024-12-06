@@ -121,7 +121,7 @@ const Overview: React.FC = () => {
                       </Typography>
                       <Chip
                         label={grade.grade.toFixed(1)}
-                        color={getGradeColor(grade.grade) as any}
+                        color={getGradeColor(grade.grade) as 'success'}
                         size="small"
                         sx={{
                           fontWeight: 500,

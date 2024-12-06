@@ -1,4 +1,4 @@
-// services/studentApi.ts
+
 import { Faculty, SearchParams, SearchResponse, Student } from '../types/student';
 
 const API_BASE_URL = 'http://localhost:3001/api';
@@ -17,7 +17,7 @@ const handleResponse = async <T>(response: Response): Promise<T> => {
   const text = await response.text();
   try {
     return JSON.parse(text) as T;
-  } catch (error) {
+  } catch  {
     console.error('Failed to parse response:', text);
     throw new Error('Invalid JSON response from server');
   }
