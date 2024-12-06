@@ -1,7 +1,7 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const { Sequelize } = require('sequelize');  // Direct import from sequelize
-const { models } = require('../config/db');
+const { models } = require('../Config/DataBaseConfig');
 class AuthController {
         async login(req, res) {
         const { login, password } = req.body;
@@ -74,7 +74,7 @@ class AuthController {
         } = req.body;
 
         try {
-            // Hash password
+
             const passwordHash = await bcrypt.hash(password, 10);
 
             // Hash SSN if provided

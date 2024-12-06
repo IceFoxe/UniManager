@@ -5,7 +5,6 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const authRoutes = require('./routes/authRoutes');
 require('dotenv').config({ path: '../.env' });
-
 async function startApp() {
     try {
         await initializeDatabase();
@@ -26,7 +25,7 @@ async function startApp() {
             employees: require('./routes2/Employees'),
             faculties: require('./routes2/Faculties'),
             grades: require('./routes2/Grades'),
-            professors: require('./routes2/Professorulls'),
+            professors: require('./routes2/Professors'),
             programs: require('./routes2/Programs'),
             students: require('./routes2/Students'),
         };

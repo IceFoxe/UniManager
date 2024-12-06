@@ -1,13 +1,13 @@
-const { models } = require('../config/db');
+const { models } = require('../Config/DataBaseConfig');
 const { getIdParam } = require('../helpers');
 
 async function searchStudents(req, res) {
     try {
         const {
             facultyId,
-            search,            // For student name/code search
-            programId,         // Optional program filter
-            year,             // Optional year filter
+            search,
+            programId,
+            year,
             page = 1,
             limit = 10
         } = req.query;
@@ -15,7 +15,7 @@ async function searchStudents(req, res) {
         const queryOptions = {
             include: [{
                 model: models.Program,
-                required: true,         // Inner join
+                required: true,
                 where: {
                     faculty_id: facultyId
                 },
@@ -30,7 +30,6 @@ async function searchStudents(req, res) {
             offset: (page - 1) * parseInt(limit)
         };
 
-        // Add search condition if provided
         if (search) {
             queryOptions.where = {
                 [Op.or]: [

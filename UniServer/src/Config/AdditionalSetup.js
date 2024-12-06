@@ -30,14 +30,11 @@ function applyExtraSetup(sequelize) {
         foreignKey: 'employee_id'
     });
 
-    // Faculty and Program many-to-many relationship
-    Faculty.belongsToMany(Program, {
-        through: FacultyProgram,
-        foreignKey: 'faculty_id'
+    Faculty.hasMany(Program, {
+        foreignKey: 'facultyId'
     });
-    Program.belongsToMany(Faculty, {
-        through: FacultyProgram,
-        foreignKey: 'program_id'
+    Program.belongsTo(Faculty, {
+        foreignKey: 'facultyId'
     });
 
     // Program relationships

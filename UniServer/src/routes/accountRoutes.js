@@ -1,15 +1,15 @@
 const express = require('express');
-const AccountController = require('../EF/controllers/AccountController');
-
 const router = express.Router();
+const AccountController = require('../controllers/accountController');
+const AccountService = require('../services/studentService');
+const AccountRepository = require('../repositories/StudentRepository');
 
-router.get('/accounts', AccountController.getAllAccounts);
-router.get('/accounts/:id', AccountController.getAccountById);
-router.post('/accounts', AccountController.createAccount);
-router.put('/accounts/:id', AccountController.updateAccount);
-router.delete('/accounts/:id', AccountController.deleteAccount);
-router.post('/login', AccountController.login);
-router.post('/accounts/:id/change-password', AccountController.changePassword);
-router.post('/register', AccountController.createAccount);
+module.exports = (sequelize) => {
+    const accountRepository = new AccountRepository(sequelize);
+    const accountService = new AccountService(accountRepository);
+    const accountController = new AccountController(accountService);
 
-module.exports = router;
+    router.get('/', (req, res) => studentController.getStudents(req, res));
+    router.get('/:id', (req, res) => studentController.getStudentById(req, res));
+    return router;
+};

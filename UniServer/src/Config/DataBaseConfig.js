@@ -14,16 +14,15 @@ const sequelize = new Sequelize('UniProject', 'aver', 'pepsi', {
 });
 
 const modelDefiners = [
-  require('../models/Account'),
-  require('../models/AuditLog'),
-  require('../models/Course'),
-  require('../models/Employee'),
-  require('../models/Faculty'),
-  require('../models/FacultyProgram'),
-  require('../models/Grade'),
-  require('../models/Professor'),
-  require('../models/Program'),
-  require('../models/Student')
+  require('../DbModels/Account'),
+  require('../DbModels/AuditLog'),
+  require('../DbModels/Course'),
+  require('../DbModels/Employee'),
+  require('../DbModels/Faculty'),
+  require('../DbModels/Grade'),
+  require('../DbModels/Professor'),
+  require('../DbModels/Program'),
+  require('../DbModels/Student')
 ];
 
 for (const modelDefiner of modelDefiners) {
@@ -37,7 +36,7 @@ const initializeDatabase = async () => {
     await sequelize.authenticate();
     console.log('Connection has been established successfully.');
     await sequelize.sync();
-    console.log('All models were synchronized successfully.');
+    console.log('All DbModels were synchronized successfully.');
 
   } catch (error) {
     console.error('Unable to connect to the database:', error);
