@@ -2,6 +2,7 @@ const {Op} = require('sequelize');
 const Student = require('../DomainModels/Student');
 const Program = require('../DomainModels/Program');
 const Account = require('../DomainModels/Account');
+const bcrypt = require("bcrypt");
 
 class StudentRepository {
     constructor(sequelize) {
@@ -87,6 +88,86 @@ class StudentRepository {
             throw new Error(`Failed to search students: ${error.message}`);
         }
     }
+    async findById(studentId) {
+    try {
+        const student = await this.Student.findOne({
+            where: { student_id: studentId },
+            include: [
+                {
+                    model: this.Account,
+                    required: true,
+                    attributes: ['first_name', 'last_name', 'account_id']
+                },
+                {
+                    model: this.Program,
+                    required: true,
+                    attributes: ['id', 'name', 'code'],
+                    include: [{
+                        model: this.Faculty,
+                        required: true
+                    }]
+                }
+            ],
+            attributes: ['student_id', 'student_number', 'account_id']
+        });
+
+        if (!student) {
+            throw new Error(`Student with ID ${studentId} not found`);
+        }
+
+        return this.toDomainModel(student);
+    } catch (error) {
+        if (error.message.includes('not found')) {
+            throw error;
+        }
+        throw new Error(`Failed to fetch student: ${error.message}`);
+    }
+}
+    async create(studentData) {
+        const t = await this.sequelize.transaction();
+        const login = `${studentData.first_name.slice(0, 3).toLowerCase()}${studentData.last_name.slice(0, 3).toLowerCase()}${studentData.student_number.slice(0, 4)}`;
+        try {
+            // Account creation aligned with DB model constraints
+            const account = await this.Account.create({
+                login,
+                email: `${studentData.student_number}@student.example.com`,
+                password_hash: await bcrypt.hash(studentData.student_number, 10),
+                first_name: studentData.first_name,
+                last_name: studentData.last_name,
+                role: 'Student',
+                created_at: new Date()
+            }, { transaction: t });
+
+
+            const student = await this.Student.create({
+                account_id: account.account_id,
+                program_id: studentData.program_id,
+                student_number: studentData.student_number,
+                semester: studentData.semester,
+                status: 'Active',
+                enrollment_date: studentData.enrollment_date || new Date(),
+                expected_graduation: studentData.expected_graduation,
+                created_at: new Date()
+            }, {
+                transaction: t,
+                include: [{
+                    model: this.Account,
+                    required: true
+                }]
+            });
+
+            await t.commit();
+            return this.toDomainModel(student);
+
+        } catch (error) {
+            await t.rollback();
+            if (error.name === 'SequelizeUniqueConstraintError') {
+                throw new Error(`Student with code ${studentData.studentCode} already exists`);
+            }
+            throw new Error(`Failed to create student: ${error.message}`);
+        }
+    }
+
 }
 
 

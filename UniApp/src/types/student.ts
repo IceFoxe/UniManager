@@ -11,6 +11,7 @@ export interface Program {
 export interface Faculty {
   id: string;
   name: string;
+  code: string;
   programs?: Program[];
 }
 
@@ -29,7 +30,16 @@ export interface SearchMetadata {
   page: number;
   limit: number;
 }
-
+export interface StudentCreate {
+  firstName: string;
+  lastName: string;
+  studentCode: string;
+  programId: number;
+  semester: number;
+  status: 'Active' | 'Inactive' | 'Graduated' | 'On Leave' | 'Suspended' | 'Withdrawn';
+  enrollmentDate: Date | null;
+  expectedGraduationDate: Date | null;
+}
 export interface Student {
   id: string;
   firstName: string;

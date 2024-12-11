@@ -93,7 +93,7 @@ module.exports = (sequelize) => {
             allowNull: false,
             validate: {
                 isIn: {
-                    args: [['student', 'employee', 'teacher', 'admin']],
+                    args: [['Student', 'Employee', 'Teacher', 'Admin']],
                     msg: 'Invalid role selected'
                 }
             }

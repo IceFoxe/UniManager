@@ -16,3 +16,5 @@ class Faculty {
         this._programs = programs;
     }
 }
+
+module.exports = Faculty;

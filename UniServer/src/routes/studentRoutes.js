@@ -10,6 +10,7 @@ module.exports = (sequelize) => {
     const studentController = new StudentController(studentService);
 
     router.get('/', (req, res) => studentController.getStudents(req, res));
+    router.post('/', (req, res) => studentController.createStudent(req, res));
     router.get('/:id', (req, res) => studentController.getStudentById(req, res));
     return router;
 };

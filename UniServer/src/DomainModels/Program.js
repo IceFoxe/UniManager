@@ -1,6 +1,6 @@
 class Program {
   constructor(data) {
-    this.id = data.program_id;
+    this.id = data.id;
     this.name = data.name;
     this.code = data.code;
     this._faculty = null;

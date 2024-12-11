@@ -28,7 +28,7 @@ import {
   Button
 } from '@mui/material';
 import { Close as CloseIcon, Add as AddIcon } from '@mui/icons-material';
-import { debounce } from 'lodash';
+import {debounce, isArray} from 'lodash';
 import StudentDetails from '../EntityViews/Uneditables/Student';
 import StudentForm from '../EntityViews/Forms/Student';
 interface StudentFormData {
@@ -88,7 +88,7 @@ const StudentList: React.FC = () => {
     const loadFaculties = async (): Promise<void> => {
       try {
         const data = await studentApi.getFaculties();
-        setFaculties(data);
+        setFaculties(isArray(data.data)? data.data: []);
       } catch (err) {
         setError('Nie udało się załadować wydziałów');
         console.error('Faculty loading error:', err);

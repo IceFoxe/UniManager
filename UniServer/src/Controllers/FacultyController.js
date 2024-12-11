@@ -2,7 +2,18 @@ class FacultyController {
   constructor(facultyService) {
     this.facultyService = facultyService;
   }
-
+  async getFacultyPrograms(req, res){
+    try {
+      const result = await this.facultyService.getFacultyPrograms(req.params.id);
+      res.json(result);
+    } catch (error) {
+      console.error('Failed to fetch faculties:', error);
+      res.status(500).json({
+        error: 'Failed to fetch faculties',
+        message: process.env.NODE_ENV === 'development' ? error.message : undefined
+      });
+    }
+  }
   async getFaculties(req, res) {
     try {
       const result = await this.facultyService.getFaculties(req.query);

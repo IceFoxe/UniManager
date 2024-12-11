@@ -30,7 +30,9 @@ async function startApp() {
         };
 
         const studentRoutes = require('./routes/studentRoutes')(sequelize);
+        const facultyRoutes = require('./routes/FacultyRoutes')(sequelize);
         app.use('/api/students', studentRoutes);
+        app.use('/api/faculties', facultyRoutes);
 
         function makeHandlerAwareOfAsyncErrors(handler) {
             return async function (req, res, next) {

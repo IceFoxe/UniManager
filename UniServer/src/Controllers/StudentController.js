@@ -15,6 +15,15 @@ class StudentController {
       });
     }
   }
+  async createStudent(req, res) {
+    try {
+      const faculty = await this.studentService.createStudent(req.body);
+      res.status(201).json(faculty);
+    } catch (error) {
+      console.error('Failed to create student:', error);
+      res.status(400).json({ error: error.message });
+    }
+  }
 
   async getStudentById(req, res) {
     try {

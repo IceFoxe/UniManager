@@ -41,6 +41,7 @@ const StudentDetails: React.FC<StudentDetailsProps> = ({ studentId }) => {
         setLoading(true);
         setError(null);
         const data = await studentApi.getStudentById(studentId);
+        console.log(data);
         setStudent(data);
       } catch (err) {
         setError('Failed to load student details');
@@ -86,10 +87,7 @@ const StudentDetails: React.FC<StudentDetailsProps> = ({ studentId }) => {
         <InfoField label="Faculty" value={student.facultyName} />
         <InfoField label="Program" value={student.programName} />
         <InfoField label="Academic Standing" value={student.academicStanding} />
-        <InfoField label="Enrollment Status" value={student.enrollmentStatus} />
-        {student.advisor && (
-          <InfoField label="Academic Advisor" value={student.advisor} />
-        )}
+        <InfoField label="Enrollment Status" value={student.status} />
       </Box>
     </Box>
   );
