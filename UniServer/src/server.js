@@ -23,7 +23,7 @@ async function startApp() {
             auditLogs: require('./routes2/AuditLogs'),
             courses: require('./routes2/Courses'),
             employees: require('./routes2/Employees'),
-            faculties: require('./routes2/Faculties'),
+
             grades: require('./routes2/Grades'),
             professors: require('./routes2/Professors'),
             programs: require('./routes2/Programs'),
