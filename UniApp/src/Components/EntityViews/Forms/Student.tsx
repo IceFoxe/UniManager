@@ -22,8 +22,8 @@ interface StudentFormData {
   firstName: string;
   lastName: string;
   studentNumber: string;
-  facultyId: string;
-  programId: string;
+  facultyId: string | null;
+  programId: string | null;
   semester: number;
   status: 'ACTIVE' | 'SUSPENDED';
   enrollmentDate: Dayjs | null;
@@ -75,7 +75,7 @@ const StudentForm: React.FC<Props> = ({ onSubmit, onClose, isLoading = false }) 
       try {
         setIsLoadingFaculties(true);
         const data = await studentApi.getFaculties();
-        setFaculties(data);
+        setFaculties(data.data);
       } catch (error) {
         console.error('Failed to load faculties:', error);
         setErrors(prev => ({ ...prev, facultyId: 'Failed to load faculties' }));
@@ -97,7 +97,7 @@ const StudentForm: React.FC<Props> = ({ onSubmit, onClose, isLoading = false }) 
       try {
         setIsLoadingPrograms(true);
         const data = await studentApi.getProgramsByFaculty(formData.facultyId);
-        setPrograms(data);
+        setPrograms(data.programs);
       } catch (error) {
         console.error('Failed to load programs:', error);
         setErrors(prev => ({ ...prev, programId: 'Failed to load programs' }));
@@ -142,7 +142,8 @@ const StudentForm: React.FC<Props> = ({ onSubmit, onClose, isLoading = false }) 
     setFormData(prev => {
       const newData = { ...prev, [name]: value };
       if (name === 'facultyId') {
-        newData.programId = '';
+        // Reset programId when faculty changes
+        newData.programId = null;
       }
       return newData;
     });
@@ -152,13 +153,16 @@ const StudentForm: React.FC<Props> = ({ onSubmit, onClose, isLoading = false }) 
     setErrors(prev => error ? { ...prev, [name]: error } : { ...prev, [name]: undefined });
   };
 
-  const handleSelectChange = (event: SelectChangeEvent<string>) => {
-    handleFieldChange(event.target.name as keyof StudentFormData, event.target.value);
+  const handleSelectChange = (event: SelectChangeEvent<number | string | null>) => {
+    const { name, value } = event.target;
+    const numericValue = value === '' ? null : Number(value);
+    handleFieldChange(name as keyof StudentFormData, numericValue);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    // Validate all fields before submission
     const hasErrors = Object.keys(formData).some(key => {
       const fieldName = key as keyof StudentFormData;
       const error = validateField(fieldName, formData[fieldName]);
@@ -172,9 +176,13 @@ const StudentForm: React.FC<Props> = ({ onSubmit, onClose, isLoading = false }) 
 
     if (hasErrors) return;
 
+    if (!formData.facultyId || !formData.programId) return;
+
     try {
       const submissionData = {
         ...formData,
+        facultyId: formData.facultyId,
+        programId: formData.programId,
         enrollmentDate: formData.enrollmentDate?.toDate() ?? null,
         expectedGraduationDate: formData.expectedGraduationDate?.toDate() ?? null,
       };
@@ -197,7 +205,7 @@ const StudentForm: React.FC<Props> = ({ onSubmit, onClose, isLoading = false }) 
             <InputLabel>Faculty</InputLabel>
             <Select
               name="facultyId"
-              value={formData.facultyId}
+              value={formData.facultyId ?? ''}
               onChange={handleSelectChange}
               label="Faculty"
             >
@@ -219,7 +227,7 @@ const StudentForm: React.FC<Props> = ({ onSubmit, onClose, isLoading = false }) 
             <InputLabel>Program</InputLabel>
             <Select
               name="programId"
-              value={formData.programId}
+              value={formData.programId ?? ''}
               onChange={handleSelectChange}
               label="Program"
             >
@@ -273,7 +281,6 @@ const StudentForm: React.FC<Props> = ({ onSubmit, onClose, isLoading = false }) 
             error={touched.semester && Boolean(errors.semester)}
             helperText={touched.semester && errors.semester}
             disabled={isLoading}
-            InputProps={{ inputProps: { min: 1, max: 12 } }}
           />
 
           <FormControl
@@ -332,7 +339,7 @@ const StudentForm: React.FC<Props> = ({ onSubmit, onClose, isLoading = false }) 
           <Button
             type="submit"
             variant="contained"
-            disabled={isLoading || Object.keys(errors).length > 0}
+            disabled={isLoading}
             startIcon={isLoading && <CircularProgress size={20} />}
           >
             Save

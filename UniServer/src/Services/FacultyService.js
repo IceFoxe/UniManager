@@ -4,6 +4,17 @@ class FacultyService {
         this.facultyRepository = facultyRepository;
     }
 
+    async getFacultyPrograms(id) {
+        const faculty = await this.facultyRepository.findById(id);
+        if (!faculty) return null;
+
+        return {
+            programs: faculty.programs?.map(program => ({
+                id: program.id,
+                name: program.name
+            }))
+        };
+    };
     async getFaculties(queryParams) {
         const filters = {
             search: queryParams.search,

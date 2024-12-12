@@ -1,4 +1,4 @@
-import { Faculty, SearchParams, SearchResponse, Student, Program } from '../types/student';
+import {SearchParams, SearchResponse, Student, Program, StudentCreate} from '../types/student';
 
 const API_BASE_URL = 'http://localhost:3001/api';
 
@@ -9,7 +9,7 @@ const getHeaders = (): HeadersInit => ({
 
 const handleResponse = async <T>(response: Response): Promise<T> => {
   if (!response.ok) {
-    const errorText = await response.text();
+    const errorText = await response.json();
     throw new Error(errorText || `HTTP error! status: ${response.status}`);
   }
 
@@ -38,31 +38,30 @@ const studentApi = {
     return handleResponse<SearchResponse>(response);
   },
 
-  async getFaculties(): Promise<Faculty[]> {
+  async getFaculties(){
     const response = await fetch(`${API_BASE_URL}/faculties`, {
       method: 'GET',
       headers: getHeaders(),
     });
 
-    return handleResponse<Faculty[]>(response);
+    return response.json();
   },
 
-  async getStudentById(id: string): Promise<Student> {
+  async getStudentById(id: string) {
     const response = await fetch(`${API_BASE_URL}/students/${id}`, {
       method: 'GET',
       headers: getHeaders()
     });
-
-    return handleResponse<Student>(response);
+    return response.json();
   },
 
-  async getProgramsByFaculty(facultyId: string): Promise<Program[]> {
-    const response = await fetch(`${API_BASE_URL}/Faculties/${facultyId}/programs`, {
+  async getProgramsByFaculty(facultyId: string) {
+    const response = await fetch(`${API_BASE_URL}/faculties/${facultyId}/programs`, {
       method: 'GET',
       headers: getHeaders()
     });
 
-    return handleResponse<Program[]>(response);
+    return response.json();
   },
 
   async getProgramById(programId: string): Promise<Program> {
@@ -71,17 +70,26 @@ const studentApi = {
       headers: getHeaders()
     });
 
-    return handleResponse<Program>(response);
+    return response.json();
   },
 
-  async createStudent(data: Omit<Student, 'id' | 'fullName' | 'facultyName' | 'programName'>): Promise<Student> {
+  async createStudent(data: StudentCreate) {
     const response = await fetch(`${API_BASE_URL}/students`, {
       method: 'POST',
       headers: getHeaders(),
-      body: JSON.stringify(data)
+      body: JSON.stringify({
+        first_name: data.firstName,
+        last_name: data.lastName,
+        student_number: data.studentCode,
+        program_id: data.programId,
+        semester: data.semester,
+        status: data.status,
+        enrollment_date: data.enrollmentDate,
+        expected_graduation: data.expectedGraduationDate
+      })
     });
 
-    return handleResponse<Student>(response);
+  return response.json();
   },
 
   async updateStudent(id: string, data: Partial<Student>): Promise<Student> {
