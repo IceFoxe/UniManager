@@ -34,9 +34,9 @@ export interface StudentCreate {
   firstName: string;
   lastName: string;
   studentCode: string;
-  programId: number;
+  programId: string;
   semester: number;
-  status: 'Active' | 'Inactive' | 'Graduated' | 'On Leave' | 'Suspended' | 'Withdrawn';
+  status: 'ACTIVE' | 'SUSPENDED' | 'Graduated' | 'On Leave' | 'Suspended' | 'Withdrawn';
   enrollmentDate: Date | null;
   expectedGraduationDate: Date | null;
 }

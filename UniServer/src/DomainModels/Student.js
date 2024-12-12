@@ -2,6 +2,7 @@ class Student {
   constructor(data) {
     this.id = data.student_id;
     this.studentCode = data.student_number;
+    this.status = data.status;
     this.firstName = null;
     this.lastName = null;
     this.year = data.year;

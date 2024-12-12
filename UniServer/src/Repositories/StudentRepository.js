@@ -1,6 +1,7 @@
 const {Op} = require('sequelize');
 const Student = require('../DomainModels/Student');
 const Program = require('../DomainModels/Program');
+const Faculty = require('../DomainModels/Faculty');
 const Account = require('../DomainModels/Account');
 const bcrypt = require("bcrypt");
 
@@ -22,6 +23,10 @@ class StudentRepository {
             student.program = new Program(plainData.Program);
         }
 
+        if(plainData.Program.Faculty){
+            student.program.faculty = new Faculty(plainData.Program.Faculty)
+        }
+
         if (plainData.Account) {
             student.firstName = plainData.Account.first_name;
             student.lastName = plainData.Account.last_name;
@@ -32,7 +37,47 @@ class StudentRepository {
     };
 
 
+    async getAllStudents(){
+        const queryOptions = {
+            include: [
+                {
+                    model: this.Account,
+                    required: true,
+                    attributes: ['first_name', 'last_name', 'account_id']
+                },
+                {
+                    model: this.Program,
+                    required: true,
+                    attributes: ['id', 'name', 'code'],
+                    include: [{
+                        model: this.Faculty,
+                        required: true,
+                    }]
+                }
+            ],
+            attributes: ['student_id', 'student_number', 'account_id'],
+            where: {},
+            limit: 10,
+            offset: ((1) - 1) * (10),
+        };
 
+        try {
+            const { rows, count } = await this.Student.findAndCountAll(queryOptions);
+
+            return {
+                data: rows.map(student => this.toDomainModel(student)),
+                total: count,
+                page: 1,
+                limit: 10
+            };
+        } catch (error) {
+            console.error('Database query error::', {
+                error: error.message,
+                sql: error.sql
+            });
+            throw new Error(`Failed to find all students: ${error.message}`);
+        }
+    }
     async searchStudents(filters) {
         const queryOptions = {
             include: [
@@ -108,7 +153,7 @@ class StudentRepository {
                     }]
                 }
             ],
-            attributes: ['student_id', 'student_number', 'account_id']
+            attributes: ['student_id', 'student_number', 'account_id', 'status']
         });
 
         if (!student) {

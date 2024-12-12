@@ -131,7 +131,7 @@ const StudentList: React.FC = () => {
       setLoading(true);
       await studentApi.createStudent({
         ...studentData,
-        studentCode: studentData.studentNumber // mapping to match API expectations
+        studentCode: studentData.studentNumber
       });
       setIsAddDialogOpen(false);
       performSearch(searchParams);

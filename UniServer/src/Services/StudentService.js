@@ -3,6 +3,27 @@ class StudentService {
         this.studentRepository = studentRepository;
     }
 
+    async getAllStudents() {
+        const result = await this.studentRepository.getAllStudents();
+
+        return {
+            data: result.data.map(student => ({
+                id: student.id,
+                fullName: student.fullName,
+                studentCode: student.studentCode,
+                academicStanding: student.academicStanding,
+                programName: student.program?.name,
+                facultyName: student.program?.faculty?.name
+            })),
+            metadata: {
+                total: result.total,
+                page: result.page,
+                limit: result.limit,
+                totalPages: Math.ceil(result.total / result.limit)
+            }
+        };
+    }
+
     async searchStudents(queryParams) {
         const filters = {
             facultyId: queryParams.facultyId,
@@ -33,6 +54,7 @@ class StudentService {
             }
         };
     }
+
     async getStudentById(id) {
         const student = await this.studentRepository.findById(id);
         if (!student) return null;
@@ -45,29 +67,28 @@ class StudentService {
             enrollmentStatus: student.enrollmentStatus,
             programName: student.program?.name,
             facultyName: student.program?.faculty?.name,
-            advisor: student.advisor?.fullName
+            status: student.status,
         };
     }
+
     async createStudent(studentData) {
-   if (!studentData.program_id || !studentData.student_number) {
-       throw new Error('Required fields missing');
-   }
+        if (!studentData.program_id || !studentData.student_number) {
+            throw new Error('Required fields missing');
+        }
 
-   // DB model compliant data structure
-   const student = await this.studentRepository.create({
-       first_name: studentData.first_name,
-       last_name: studentData.last_name,
-       student_number: studentData.student_number,
-       program_id: studentData.program_id,
-       status: studentData.status || 'Active',
-       enrollment_date: studentData.enrollment_date || new Date(),
-       expected_graduation: studentData.expected_graduation,
-       semester: studentData.semester || 1
-   });
+        const student = await this.studentRepository.create({
+            first_name: studentData.first_name,
+            last_name: studentData.last_name,
+            student_number: studentData.student_number,
+            program_id: studentData.program_id,
+            status: studentData.status || 'Active',
+            enrollment_date: studentData.enrollment_date || new Date(),
+            expected_graduation: studentData.expected_graduation,
+            semester: studentData.semester || 1
+        });
 
-   // POST endpoints typically return created entity ID
-   return { id: student.student_id };
-}
+        return {id: student.student_id};
+    }
 }
 
 module.exports = StudentService;
