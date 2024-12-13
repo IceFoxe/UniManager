@@ -8,7 +8,7 @@ name = 'Default'
 environments = ['Local']
 
 [auth.bearer]
-token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsImxvZ2luIjoiYWRtaW4iLCJlbWFpbCI6InJleGl2ZXIxMUBnbWFpbC5jb20iLCJyb2xlIjoiRW1wbG95ZWUiLCJmaXJzdE5hbWUiOiJKYWt1YiIsImxhc3ROYW1lIjoiRyIsImlhdCI6MTczMzk5NDczMywiZXhwIjoxNzM0MDAxOTMzfQ.Xs_84L-3GMmI6g0Vpi5lJba7ohjx_9zn59mUdXxh-XQ'
+token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImxvZ2luIjoiQWRtaW4iLCJlbWFpbCI6ImxvbEBnbWFpbC5jb20iLCJyb2xlIjoiRW1wbG95ZWUiLCJmaXJzdE5hbWUiOiJKYWt1YiIsImxhc3ROYW1lIjoiRyIsImlhdCI6MTczNDA5MzE1NSwiZXhwIjoxNzM0MTAwMzU1fQ.e7G6S4lt3vt6jVAo_-DjPQlK2gyr8ycpUnPAATwbaww'
 ```
 
 #### Variables

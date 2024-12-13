@@ -29,7 +29,7 @@ const studentApi = {
       page: params.page.toString(),
       limit: params.limit.toString()
     });
-
+    console.log(`${API_BASE_URL}/students?${queryParams}`);
     const response = await fetch(`${API_BASE_URL}/students?${queryParams}`, {
       method: 'GET',
       headers: getHeaders()

@@ -1,13 +1,11 @@
 import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 
-// Interface for decoded token
 interface DecodedToken {
   exp?: number;
   [key: string]: any;
 }
 
-// Function to check if token is valid
 export const isTokenValid = (token?: string | null): boolean => {
   if (!token) return false;
 
@@ -15,7 +13,6 @@ export const isTokenValid = (token?: string | null): boolean => {
     const [, payloadBase64] = token.split('.');
     if (!payloadBase64) return false;
 
-    // Decode base64 payload
     const payload = JSON.parse(
       decodeURIComponent(
         atob(payloadBase64.replace('-', '+').replace('_', '/'))
@@ -25,7 +22,6 @@ export const isTokenValid = (token?: string | null): boolean => {
       )
     ) as DecodedToken;
 
-    // Check expiration
     if (payload.exp) {
       const currentTime = Math.floor(Date.now() / 1000);
       return payload.exp > currentTime;
@@ -50,33 +46,30 @@ export const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ childr
     />;
   }
 
-  // If token is valid, render the children
   return <>{children}</>;
 };
 
-// Custom Hook for Authentication
 export const useAuth = () => {
-  const token = localStorage.getItem('token');
+  const token = localStorage.getItem('authToken');
 
   return {
     isAuthenticated: isTokenValid(token),
     token,
     login: (newToken: string) => {
-      localStorage.setItem('token', newToken);
+      localStorage.setItem('authToken', newToken);
     },
     logout: () => {
-      localStorage.removeItem('token');
+      localStorage.removeItem('authToken');
     }
   };
 };
 
-// Axios Interceptor for automatic token handling (optional)
 import axios from 'axios';
 
 export const setupAuthInterceptor = () => {
   axios.interceptors.request.use(
     (config) => {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('authToken');
       if (token) {
         config.headers['Authorization'] = `Bearer ${token}`;
       }
@@ -90,9 +83,8 @@ export const setupAuthInterceptor = () => {
   axios.interceptors.response.use(
     (response) => response,
     (error) => {
-      // If unauthorized, redirect to login
       if (error.response && error.response.status === 401) {
-        localStorage.removeItem('token');
+        localStorage.removeItem('authToken');
         window.location.href = '/login';
       }
       return Promise.reject(error);

@@ -1,5 +1,3 @@
-// src/styles/DashboardStyles.ts
-
 export const darkTheme = {
   palette: {
     mode: 'dark',

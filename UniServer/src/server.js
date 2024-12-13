@@ -9,6 +9,11 @@ const authRoutes = require('./routes/AuthRoutes');
 const studentRoutes = require('./routes/StudentRoutes')(sequelize);
 const facultyRoutes = require('./routes/FacultyRoutes')(sequelize);
 const programRoutes = require('./routes/ProgramRoutes')(sequelize);
+const logRoutes = require('./routes/LogRoutes')(sequelize);
+const professorRoutes = require('./routes/ProfessorRoutes')(sequelize);
+const gradeRoutes = require('./routes/GradeRoutes')
+const courseRoutes = require('./routes/CourseRoutes')
+
 async function startApp() {
     try {
         await initializeDatabase();
@@ -25,6 +30,10 @@ async function startApp() {
         app.use('/api/students', studentRoutes);
         app.use('/api/programs', programRoutes);
         app.use('/api/faculties', facultyRoutes);
+        app.use('/api/logs', logRoutes);
+        app.use('/api/professors', professorRoutes);
+        app.use('/api/grades', gradeRoutes);
+        app.use('/api/courses', gradeRoutes);
         app.use('/api/auth', authRoutes);
         // Error handling middleware
         app.use((err, req, res, next) => {

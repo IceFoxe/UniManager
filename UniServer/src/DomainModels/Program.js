@@ -3,6 +3,10 @@ class Program {
     this.id = data.id;
     this.name = data.name;
     this.code = data.code;
+    this.description = data.description;
+    this.degreeLevel = data.degreeLevel;
+    this.duration = data.duration;
+    this.isActive = data.isActive;
     this._faculty = null;
   }
 
