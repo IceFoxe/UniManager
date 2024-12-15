@@ -1,4 +1,3 @@
-// services/facultyService.js
 class FacultyService {
     constructor(facultyRepository) {
         this.facultyRepository = facultyRepository;

@@ -16,7 +16,7 @@ function App() {
                     <Route path="/login" element={<Login/>}/>
                     <Route path="/" element={<LandingPage/>}/>
                     <Route
-                        path="/panel_uzytkownika"
+                        path="/panel_uzytkownika/*"
                         element={
                             <ProtectedRoute>
                                 <DashboardLayout/>

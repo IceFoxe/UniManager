@@ -75,19 +75,25 @@ class StudentService {
         if (!studentData.program_id || !studentData.student_number) {
             throw new Error('Required fields missing');
         }
+        const t = await this.studentRepository.sequelize.transaction();
+        try{
+            const student = await this.studentRepository.create(t, {
+                first_name: studentData.first_name,
+                last_name: studentData.last_name,
+                student_number: studentData.student_number,
+                program_id: studentData.program_id,
+                status: studentData.status || 'Active',
+                enrollment_date: studentData.enrollment_date || new Date(),
+                expected_graduation: studentData.expected_graduation,
+                semester: studentData.semester || 1
+            });
 
-        const student = await this.studentRepository.create({
-            first_name: studentData.first_name,
-            last_name: studentData.last_name,
-            student_number: studentData.student_number,
-            program_id: studentData.program_id,
-            status: studentData.status || 'Active',
-            enrollment_date: studentData.enrollment_date || new Date(),
-            expected_graduation: studentData.expected_graduation,
-            semester: studentData.semester || 1
-        });
-
-        return {id: student.student_id};
+            return {id: student.student_id};
+            t.commit();
+        }
+        catch(error){
+            t.rollback();
+        }
     }
 }
 

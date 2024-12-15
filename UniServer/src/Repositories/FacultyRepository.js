@@ -1,11 +1,8 @@
-const { Op } = require('sequelize');
-const Faculty = require('../DomainModels/Faculty');
-const Program = require('../DomainModels/Program');
-
+const Faculty = require('../DomainModels/Faculty')
+const Program = require('../DomainModels/Program')
 class FacultyRepository {
     constructor(sequelize) {
         this.sequelize = sequelize;
-        this.dialect = sequelize.getDialect();
         this.Faculty = sequelize.models.Faculty;
         this.Program = sequelize.models.Program;
     }
@@ -21,67 +18,145 @@ class FacultyRepository {
         return faculty;
     }
 
-    async findAll(filters) {
-        const queryOptions = {
-            include: [{
-                model: this.Program,
-                required: false,
-                attributes: ['id', 'name', 'code']
-            }],
-            where: {},
-            limit: filters.limit || 10,
-            offset: ((filters.page || 1) - 1) * (filters.limit || 10),
-            order: [[filters.sortBy || 'name', filters.sortDir || 'ASC']]
-        };
+    async create(facultyData) {
+        const t = await this.sequelize.transaction();
+        try {
+            const faculty = await this.Faculty.create({
+                name: facultyData.name,
+                code: facultyData.code,
+                created_at: new Date()
+            }, { transaction: t });
 
-        if (filters.search) {
-            queryOptions.where[Op.or] = [
-                { name: { [Op.iLike]: `%${filters.search}%` }},
-                { code: { [Op.iLike]: `%${filters.search}%` }}
-            ];
+            await t.commit();
+            return this.toDomainModel(faculty);
+        } catch (error) {
+            await t.rollback();
+            if (error.name === 'SequelizeUniqueConstraintError') {
+                throw new Error(`Faculty with code ${facultyData.code} already exists`);
+            }
+            throw new Error(`Failed to create faculty: ${error.message}`);
         }
+    }
+
+    async findById(id) {
+        try {
+            const faculty = await this.Faculty.findOne({
+                where: { id },
+                include: [{
+                    model: this.Program,
+                    required: false
+                }]
+            });
+
+            if (!faculty) {
+                throw new Error(`Faculty with ID ${id} not found`);
+            }
+
+            return this.toDomainModel(faculty);
+        } catch (error) {
+            throw new Error(`Failed to fetch faculty: ${error.message}`);
+        }
+    }
+
+    async findAll(options = {}) {
+        const {
+            page = 1,
+            limit = 10,
+            search,
+            sortBy = 'createdAt',
+            sortDir = 'DESC'
+        } = options;
 
         try {
+            const queryOptions = {
+                include: [{
+                    model: this.Program,
+                    required: false
+                }],
+                where: {},
+                order: [[sortBy, sortDir]],
+                limit,
+                offset: (page - 1) * limit
+            };
+
+            if (search) {
+                queryOptions.where = {
+                    [this.sequelize.Op.or]: [
+                        {
+                            name: {
+                                [this.sequelize.Op.iLike]: `%${search}%`
+                            }
+                        },
+                        {
+                            code: {
+                                [this.sequelize.Op.iLike]: `%${search}%`
+                            }
+                        }
+                    ]
+                };
+            }
+
             const { rows, count } = await this.Faculty.findAndCountAll(queryOptions);
 
             return {
                 data: rows.map(faculty => this.toDomainModel(faculty)),
                 total: count,
-                page: filters.page || 1,
-                limit: filters.limit || 10
+                page,
+                limit
             };
         } catch (error) {
-            console.error('Database query failed:', {
-                error: error.message,
-                sql: error.sql
-            });
             throw new Error(`Failed to fetch faculties: ${error.message}`);
         }
     }
 
-    async findById(id) {
-        const faculty = await this.Faculty.findByPk(id, {
-            include: [{
-                model: this.Program,
-                required: false,
-                attributes: ['id', 'name', 'code']
-            }]
-        });
+    async update(id, facultyData) {
+        const t = await this.sequelize.transaction();
+        try {
+            const faculty = await this.Faculty.findByPk(id, { transaction: t });
+            if (!faculty) {
+                await t.rollback();
+                throw new Error(`Faculty with ID ${id} not found`);
+            }
 
-        return faculty ? this.toDomainModel(faculty) : null;
+            await faculty.update(facultyData, { transaction: t });
+            await t.commit();
+
+            return this.toDomainModel(faculty);
+        } catch (error) {
+            await t.rollback();
+            if (error.name === 'SequelizeUniqueConstraintError') {
+                throw new Error(`Faculty with code ${facultyData.code} already exists`);
+            }
+            throw new Error(`Failed to update faculty: ${error.message}`);
+        }
     }
 
-    async findByCode(code) {
-        const faculty = await this.Faculty.findOne({
-            where: { code },
-            include: [{
-                model: this.Program,
-                required: false,
-                attributes: ['id', 'name', 'code']
-            }]
-        });
+    async delete(id) {
+        const t = await this.sequelize.transaction();
+        try {
+            const faculty = await this.Faculty.findByPk(id, { transaction: t });
+            if (!faculty) {
+                await t.rollback();
+                throw new Error(`Faculty with ID ${id} not found`);
+            }
 
-        return faculty ? this.toDomainModel(faculty) : null;
+            const programCount = await this.Program.count({
+                where: { faculty_id: id },
+                transaction: t
+            });
+
+            if (programCount > 0) {
+                await t.rollback();
+                throw new Error('Cannot delete faculty with associated programs');
+            }
+
+            await faculty.destroy({ transaction: t });
+            await t.commit();
+            return true;
+        } catch (error) {
+            await t.rollback();
+            throw new Error(`Failed to delete faculty: ${error.message}`);
+        }
     }
 }
 

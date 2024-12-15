@@ -172,7 +172,6 @@ class StudentRepository {
         const t = await this.sequelize.transaction();
         const login = `${studentData.first_name.slice(0, 3).toLowerCase()}${studentData.last_name.slice(0, 3).toLowerCase()}${studentData.student_number.slice(0, 4)}`;
         try {
-            // Account creation aligned with DB model constraints
             const account = await this.Account.create({
                 login,
                 email: `${studentData.student_number}@student.example.com`,

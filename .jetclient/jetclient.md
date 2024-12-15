@@ -8,7 +8,7 @@ name = 'Default'
 environments = ['Local']
 
 [auth.bearer]
-token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImxvZ2luIjoiQWRtaW4iLCJlbWFpbCI6ImxvbEBnbWFpbC5jb20iLCJyb2xlIjoiRW1wbG95ZWUiLCJmaXJzdE5hbWUiOiJKYWt1YiIsImxhc3ROYW1lIjoiRyIsImlhdCI6MTczNDA5MzE1NSwiZXhwIjoxNzM0MTAwMzU1fQ.e7G6S4lt3vt6jVAo_-DjPQlK2gyr8ycpUnPAATwbaww'
+token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImxvZ2luIjoiQWRtaW4iLCJlbWFpbCI6ImxvbEBnbWFpbC5jb20iLCJyb2xlIjoiRW1wbG95ZWUiLCJmaXJzdE5hbWUiOiJKYWt1YiIsImxhc3ROYW1lIjoiRyIsInZlcnNpb24iOjE3MzQyMTQ0NTk1MjUsImlhdCI6MTczNDIxNDQ1OSwiZXhwIjoxNzM0MjE1MzU5fQ.st__bM-WznIWlajCDc9lW_EVXJ5j6YtHd4RqAWHERO4'
 ```
 
 #### Variables
@@ -16,7 +16,7 @@ token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImxvZ2luIjoiQWRtaW
 ```json5
 {
   Local: {
-    baseUrl: 'http://localhost:3001/'
+    baseUrl: 'http://localhost:3001'
   }
 }
 ```

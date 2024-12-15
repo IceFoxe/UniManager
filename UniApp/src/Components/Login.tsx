@@ -21,17 +21,6 @@ import {
     School as SchoolIcon,
 } from '@mui/icons-material';
 
-interface LoginResponse {
-    token: string;
-    user: {
-        id: number;
-        login: string;
-        email: string;
-        role: string;
-        firstName: string;
-        lastName: string;
-    };
-}
 
 const darkTheme = {
     palette: {
@@ -46,6 +35,23 @@ const darkTheme = {
         }
     },
 };
+
+interface LoginResponse {
+    status: 'success' | 'error';
+    data?: {
+        accessToken: string;
+        refreshToken: string;
+        user: {
+            id: number;
+            login: string;
+            email: string;
+            role: string;
+            firstName: string;
+            lastName: string;
+        };
+    };
+    message?: string;
+}
 
 const Login: React.FC = () => {
     const [username, setUsername] = useState('');
@@ -86,15 +92,34 @@ const Login: React.FC = () => {
                 }
             );
 
-            const { token, user } = response.data;
+            if (response.data.status === 'success' && response.data.data) {
+                const { accessToken, refreshToken, user } = response.data.data;
 
-            localStorage.setItem('authToken', token);
-            localStorage.setItem('user', JSON.stringify(user));
-            axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-            navigate('/panel_uzytkownika');
+                // Store tokens
+                localStorage.setItem('authToken', accessToken);
+                localStorage.setItem('refreshToken', refreshToken);
+                localStorage.setItem('user', JSON.stringify(user));
+
+                // Set default authorization header
+                axios.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
+
+                // Redirect to dashboard
+                const defaultRoutes = {
+                    employee: '/panel_uzytkownika/e/overview',
+                    professor: '/panel_uzytkownika/p/overview',
+                    student: '/panel_uzytkownika/d/overview'
+                };
+
+                const defaultRoute = defaultRoutes[user.role.toLowerCase() as keyof typeof defaultRoutes]
+                    || '/panel_uzytkownika';
+
+                navigate(defaultRoute);
+            } else {
+                setLoginError(response.data.message || 'Login failed');
+            }
         } catch (error) {
             if (axios.isAxiosError(error)) {
-                const message = error.response?.data?.error || 'Invalid credentials';
+                const message = error.response?.data?.message || 'Invalid credentials';
                 setLoginError(message);
             } else {
                 setLoginError('An unexpected error occurred');

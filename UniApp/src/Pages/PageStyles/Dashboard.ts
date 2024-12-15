@@ -29,7 +29,7 @@ export const styles = {
   },
 
   logo: {
-    margin: 'auto',
+    margin: '-7px',
     fontSize: 40,
     color: 'primary.main'
   },

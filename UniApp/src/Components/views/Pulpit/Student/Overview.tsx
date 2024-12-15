@@ -10,7 +10,7 @@ import {
   useTheme
 } from '@mui/material';
 import { format } from 'date-fns';
-import Schedule from './Schedule';
+import Schedule from './Schedule.tsx';
 
 interface Grade {
   subject: string;
