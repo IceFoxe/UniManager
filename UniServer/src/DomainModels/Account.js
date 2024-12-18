@@ -9,13 +9,11 @@ class Account {
     this.lastLogin = data.last_login ? new Date(data.last_login) : null;
     this.createdAt = data.created_at ? new Date(data.created_at) : null;
 
-    // Related entities - initialized as null and set via setters
     this._student = null;
     this._employee = null;
     this._auditLogs = [];
   }
 
-  // Identity and access methods
   get fullName() {
     return `${this.firstName || ''} ${this.lastName || ''}`.trim();
   }

@@ -4,6 +4,7 @@ const Program = require('../DomainModels/Program');
 const Faculty = require('../DomainModels/Faculty');
 const Account = require('../DomainModels/Account');
 const bcrypt = require("bcrypt");
+const {static} = require("express");
 
 class StudentRepository {
     constructor(sequelize) {
@@ -21,11 +22,12 @@ class StudentRepository {
 
         if (plainData.Program) {
             student.program = new Program(plainData.Program);
+            if(plainData.Program.Faculty){
+            student.program.faculty = new Faculty(plainData.Program.Faculty)
+            }
         }
 
-        if(plainData.Program.Faculty){
-            student.program.faculty = new Faculty(plainData.Program.Faculty)
-        }
+
 
         if (plainData.Account) {
             student.firstName = plainData.Account.first_name;
@@ -168,23 +170,10 @@ class StudentRepository {
         throw new Error(`Failed to fetch student: ${error.message}`);
     }
 }
-    async create(studentData) {
-        const t = await this.sequelize.transaction();
-        const login = `${studentData.first_name.slice(0, 3).toLowerCase()}${studentData.last_name.slice(0, 3).toLowerCase()}${studentData.student_number.slice(0, 4)}`;
+    async create(studentData, options ={}) {
         try {
-            const account = await this.Account.create({
-                login,
-                email: `${studentData.student_number}@student.example.com`,
-                password_hash: await bcrypt.hash(studentData.student_number, 10),
-                first_name: studentData.first_name,
-                last_name: studentData.last_name,
-                role: 'Student',
-                created_at: new Date()
-            }, { transaction: t });
-
-
             const student = await this.Student.create({
-                account_id: account.account_id,
+                account_id: studentData.account_id,
                 program_id: studentData.program_id,
                 student_number: studentData.student_number,
                 semester: studentData.semester,
@@ -193,18 +182,10 @@ class StudentRepository {
                 expected_graduation: studentData.expected_graduation,
                 created_at: new Date()
             }, {
-                transaction: t,
-                include: [{
-                    model: this.Account,
-                    required: true
-                }]
+                transaction: options.transaction,
             });
-
-            await t.commit();
             return this.toDomainModel(student);
-
         } catch (error) {
-            await t.rollback();
             if (error.name === 'SequelizeUniqueConstraintError') {
                 throw new Error(`Student with code ${studentData.studentCode} already exists`);
             }

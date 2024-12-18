@@ -1,8 +1,36 @@
-const { Op } = require('sequelize');
+const {Op} = require('sequelize');
 
 class AuditLogRepository {
     constructor(sequelize) {
         this.AuditLog = sequelize.models.AuditLog;
+    }
+
+    async create(auditLogData, options = {}) {
+
+
+        try {
+            const createdLog = await this.AuditLog.create({
+                account_id: auditLogData.account_id,
+                timestamp: auditLogData.timestamp,
+                action: auditLogData.action,
+                table_name: auditLogData.table_name,
+                record_id: auditLogData.record_id,
+                old_values: auditLogData.old_values,
+                new_values: auditLogData.new_values,
+                ip_address: auditLogData.ip_address,
+                user_agent: auditLogData.user_agent,
+                created_at: auditLogData.created_at
+            },{
+                transaction: options.transaction
+            });
+
+            return createdLog;
+        } catch (error) {
+            if (error.name === 'SequelizeValidationError') {
+                throw new Error(`Database validation failed: ${error.message}`);
+            }
+            throw new Error(`Failed to create audit log: ${error.message}`);
+        }
     }
 
     async searchLogs(params) {
@@ -30,7 +58,7 @@ class AuditLogRepository {
             }
         }
 
-        const { rows: data, count: total } = await this.AuditLog.findAndCountAll({
+        const {rows: data, count: total} = await this.AuditLog.findAndCountAll({
             where,
             order: [['timestamp', 'DESC']],
             limit: params.limit,

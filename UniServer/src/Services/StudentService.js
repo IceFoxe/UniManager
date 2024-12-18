@@ -1,6 +1,10 @@
+const bcrypt = require("bcrypt");
+
 class StudentService {
-    constructor(studentRepository) {
+    constructor(studentRepository, logRepository, accountRepository) {
         this.studentRepository = studentRepository;
+        this.logRepository = logRepository;
+        this.accountRepository = accountRepository;
     }
 
     async getAllStudents() {
@@ -71,13 +75,24 @@ class StudentService {
         };
     }
 
-    async createStudent(studentData) {
+    async createStudent(studentData, userData) {
         if (!studentData.program_id || !studentData.student_number) {
             throw new Error('Required fields missing');
         }
         const t = await this.studentRepository.sequelize.transaction();
         try{
-            const student = await this.studentRepository.create(t, {
+            const login = `${studentData.first_name.slice(0, 3).toLowerCase()}${studentData.last_name.slice(0, 3).toLowerCase()}${studentData.student_number.slice(2, 6)}`;
+            const acc = await this.accountRepository.create({
+                login: login,
+                email: `${studentData.student_number}@gmail.com`,
+                password_hash: await bcrypt.hash(studentData.student_number, 10),
+                first_name: studentData.first_name,
+                last_name: studentData.last_name,
+                role: 'Student',
+            }, {transaction: t});
+
+            const student = await this.studentRepository.create( {
+                account_id: acc.id,
                 first_name: studentData.first_name,
                 last_name: studentData.last_name,
                 student_number: studentData.student_number,
@@ -86,13 +101,23 @@ class StudentService {
                 enrollment_date: studentData.enrollment_date || new Date(),
                 expected_graduation: studentData.expected_graduation,
                 semester: studentData.semester || 1
-            });
+            }, {transaction: t});
 
-            return {id: student.student_id};
+            const log = await this.logRepository.create({
+                account_id: userData.userId,
+                timestamp: new Date(),
+                action: 'CREATE',
+                table_name: 'student',
+                record_id: student.id,
+                old_values: '',
+                new_values: JSON.stringify(studentData),
+            }, {transaction: t});
             t.commit();
+            return {id: student.id};
         }
         catch(error){
             t.rollback();
+            throw new Error(`Failed to create student: ${error.message}`);
         }
     }
 }

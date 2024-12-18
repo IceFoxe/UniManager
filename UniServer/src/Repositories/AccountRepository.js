@@ -1,22 +1,22 @@
-const Account = require('../domain/models/Account');
-const Student = require('../domain/models/Student');
-const Employee = require('../domain/models/Employee');
-const AuditLog = require('../domain/models/AuditLog');
+const Account = require('../DomainModels/Account');
+const Student = require('../DomainModels/Student');
+const Employee = require('../DomainModels/Employee');
+const AuditLog = require('../DomainModels/AuditLog');
+const bcrypt = require("bcrypt");
 
 class AccountRepository {
   constructor(sequelize) {
     this.sequelize = sequelize;
+    this.Account = sequelize.models.Account;
   }
 
   toDomainModel(dbModel) {
     const plainData = dbModel.get({ plain: true });
     const account = new Account(plainData);
 
-    // Handle related entities if they were included in the query
     if (plainData.Student) {
       account.student = new Student(plainData.Student);
     }
-
     if (plainData.Employee) {
       account.employee = new Employee(plainData.Employee);
     }
@@ -85,6 +85,23 @@ class AccountRepository {
       page,
       limit
     };
+  }
+  async create(accountData, options ={}) {
+        try {
+            const account = await this.Account.create({
+                login: accountData.login,
+                email: `${accountData.student_number}@gmail.com`,
+                password_hash: await bcrypt.hash(accountData.student_number, 10),
+                first_name: accountData.first_name,
+                last_name: accountData.last_name,
+                role: accountData.role,
+                created_at: new Date()
+            }, { transaction: options.transaction });
+             return this.toDomainModel(account);
+        } catch (error){
+          throw new error;
+        }
+
   }
 }
 

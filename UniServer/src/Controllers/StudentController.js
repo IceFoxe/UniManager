@@ -28,7 +28,7 @@ class StudentController {
   }
   async createStudent(req, res) {
     try {
-      const faculty = await this.studentService.createStudent(req.body);
+      const faculty = await this.studentService.createStudent(req.body, req.user);
       res.status(201).json(faculty);
     } catch (error) {
       console.error('Failed to create student:', error);

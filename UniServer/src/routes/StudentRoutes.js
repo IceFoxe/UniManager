@@ -3,12 +3,17 @@ const router = express.Router();
 const StudentController = require('../controllers/studentController');
 const StudentService = require('../services/studentService');
 const StudentRepository = require('../repositories/StudentRepository');
+const LogRepository = require('../repositories/LogRepository');
+const AccountRepository = require('../repositories/AccountRepository');
 const authMiddleware = require("../middleware/auth");
 
 module.exports = (sequelize) => {
     const studentRepository = new StudentRepository(sequelize);
-    const studentService = new StudentService(studentRepository);
+    const logRepository = new LogRepository(sequelize);
+    const accountRepository = new AccountRepository(sequelize);
+    const studentService = new StudentService(studentRepository, logRepository, accountRepository);
     const studentController = new StudentController(studentService);
+
 
     router.get('/search', authMiddleware.auth,
         authMiddleware.checkPermission(['admin', 'professor', 'student']), (req, res) =>
