@@ -1,10 +1,15 @@
 const express = require('express');
 const {auth, checkPermission} = require("../middleware/auth");
+const LogRepository = require("../repositories/LogRepository");
+const CourseRepository = require("../repositories/CourseRepository");
+const CourseService = require("../Services/CourseService");
+const CourseController = require("../Controllers/CourseController");
 const router = express.Router();
 
 module.exports = (sequelize) => {
+    const logRepository = new LogRepository(sequelize);
     const courseRepository = new CourseRepository(sequelize);
-    const courseService = new CourseService(courseRepository);
+    const courseService = new CourseService(courseRepository, logRepository);
     const courseController = new CourseController(courseService);
 
     router.post('/', auth,

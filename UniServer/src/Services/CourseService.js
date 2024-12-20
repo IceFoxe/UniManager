@@ -1,14 +1,34 @@
 class CourseService {
-    constructor(courseRepository) {
+    constructor(courseRepository, logRepository) {
         this.courseRepository = courseRepository;
+        this.logRepository = logRepository;
     }
 
-    async createCourse(courseData) {
+    async createCourse(courseData, userData) {
         if (!courseData.program_id || !courseData.teacher_id || !courseData.name || !courseData.code) {
             throw new Error('Required fields missing');
         }
 
-        return await this.courseRepository.create(courseData);
+        const t = await this.courseRepository.sequelize.transaction();
+        try {
+            const course = await this.courseRepository.create(courseData, { transaction: t });
+
+            await this.logRepository.create({
+                account_id: userData.userId,
+                timestamp: new Date(),
+                action: 'CREATE',
+                table_name: 'course',
+                record_id: course.id,
+                old_values: '',
+                new_values: JSON.stringify(courseData),
+            }, { transaction: t });
+
+            await t.commit();
+            return course;
+        } catch (error) {
+            await t.rollback();
+            throw new Error(`Failed to create course: ${error.message}`);
+        }
     }
 
     async getCourseById(id) {
@@ -74,12 +94,60 @@ class CourseService {
         };
     }
 
-    async updateCourse(id, courseData) {
-        return await this.courseRepository.update(id, courseData);
+    async updateCourse(id, courseData, userData) {
+        const t = await this.courseRepository.sequelize.transaction();
+        try {
+            const oldCourse = await this.courseRepository.findById(id);
+            if (!oldCourse) {
+                throw new Error('Course not found');
+            }
+
+            const updatedCourse = await this.courseRepository.update(id, courseData, { transaction: t });
+
+            await this.logRepository.create({
+                account_id: userData.userId,
+                timestamp: new Date(),
+                action: 'UPDATE',
+                table_name: 'course',
+                record_id: id,
+                old_values: JSON.stringify(oldCourse),
+                new_values: JSON.stringify(courseData),
+            }, { transaction: t });
+
+            await t.commit();
+            return updatedCourse;
+        } catch (error) {
+            await t.rollback();
+            throw new Error(`Failed to update course: ${error.message}`);
+        }
     }
 
-    async deleteCourse(id) {
-        return await this.courseRepository.delete(id);
+    async deleteCourse(id, userData) {
+        const t = await this.courseRepository.sequelize.transaction();
+        try {
+            const course = await this.courseRepository.findById(id);
+            if (!course) {
+                throw new Error('Course not found');
+            }
+
+            await this.courseRepository.delete(id, { transaction: t });
+
+            await this.logRepository.create({
+                account_id: userData.userId,
+                timestamp: new Date(),
+                action: 'DELETE',
+                table_name: 'course',
+                record_id: id,
+                old_values: JSON.stringify(course),
+                new_values: '',
+            }, { transaction: t });
+
+            await t.commit();
+            return true;
+        } catch (error) {
+            await t.rollback();
+            throw new Error(`Failed to delete course: ${error.message}`);
+        }
     }
 
     async getCourseStudents(courseId) {
@@ -90,3 +158,5 @@ class CourseService {
         return await this.courseRepository.getCoursesByTeacher(teacherId);
     }
 }
+
+module.exports = CourseService;

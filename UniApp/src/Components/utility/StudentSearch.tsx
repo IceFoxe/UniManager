@@ -236,7 +236,7 @@ const StudentList: React.FC = () => {
   );
 
   return (
-    <Box sx={{ margin: '0 auto', p: 3 }}>
+    <Box sx={{ margin: '0px', p: 3 , width: '100%'}}>
       <Card>
         <CardContent>
           <Box sx={{

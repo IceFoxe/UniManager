@@ -1,6 +1,7 @@
 class FacultyService {
-    constructor(facultyRepository) {
+    constructor(facultyRepository, logRepository) {
         this.facultyRepository = facultyRepository;
+        this.logRepository = logRepository;
     }
 
     async getFacultyPrograms(id) {
@@ -14,6 +15,7 @@ class FacultyService {
             }))
         };
     };
+
     async getFaculties(queryParams) {
         const filters = {
             search: queryParams.search,
@@ -60,16 +62,83 @@ class FacultyService {
         };
     }
 
-    async createFaculty(data) {
-        return this.facultyRepository.create(data);
+    async createFaculty(data, userData) {
+        const t = await this.facultyRepository.sequelize.transaction();
+        try {
+            const faculty = await this.facultyRepository.create(data, { transaction: t });
+
+            await this.logRepository.create({
+                account_id: userData.userId,
+                timestamp: new Date(),
+                action: 'CREATE',
+                table_name: 'faculty',
+                record_id: faculty.id,
+                old_values: '',
+                new_values: JSON.stringify(data),
+            }, { transaction: t });
+
+            await t.commit();
+            return faculty;
+        } catch (error) {
+            await t.rollback();
+            throw new Error(`Failed to create faculty: ${error.message}`);
+        }
     }
 
-    async updateFaculty(id, data) {
-        return this.facultyRepository.update(id, data);
+    async updateFaculty(id, data, userData) {
+        const t = await this.facultyRepository.sequelize.transaction();
+        try {
+            const oldFaculty = await this.facultyRepository.findById(id);
+            if (!oldFaculty) {
+                throw new Error('Faculty not found');
+            }
+
+            const updatedFaculty = await this.facultyRepository.update(id, data, { transaction: t });
+
+            await this.logRepository.create({
+                account_id: userData.userId,
+                timestamp: new Date(),
+                action: 'UPDATE',
+                table_name: 'faculty',
+                record_id: id,
+                old_values: JSON.stringify(oldFaculty),
+                new_values: JSON.stringify(data),
+            }, { transaction: t });
+
+            await t.commit();
+            return updatedFaculty;
+        } catch (error) {
+            await t.rollback();
+            throw new Error(`Failed to update faculty: ${error.message}`);
+        }
     }
 
-    async deleteFaculty(id) {
-        return this.facultyRepository.delete(id);
+    async deleteFaculty(id, userData) {
+        const t = await this.facultyRepository.sequelize.transaction();
+        try {
+            const faculty = await this.facultyRepository.findById(id);
+            if (!faculty) {
+                throw new Error('Faculty not found');
+            }
+
+            await this.facultyRepository.delete(id, { transaction: t });
+
+            await this.logRepository.create({
+                account_id: userData.userId,
+                timestamp: new Date(),
+                action: 'DELETE',
+                table_name: 'faculty',
+                record_id: id,
+                old_values: JSON.stringify(faculty),
+                new_values: '',
+            }, { transaction: t });
+
+            await t.commit();
+            return true;
+        } catch (error) {
+            await t.rollback();
+            throw new Error(`Failed to delete faculty: ${error.message}`);
+        }
     }
 }
 

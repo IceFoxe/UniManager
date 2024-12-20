@@ -19,7 +19,7 @@ class ProgramRepository {
         return program;
     }
 
-    async create(programData) {
+    async create(programData, options = {}) {
         try {
             const program = await this.Program.create({
                 name: programData.name,
@@ -29,7 +29,8 @@ class ProgramRepository {
                 degreeLevel: programData.degreeLevel,
                 duration: programData.duration,
                 isActive: programData.isActive || true,
-                createdAt: new Date()
+                createdAt: new Date(),
+                transaction: options.transaction
             });
 
             return this.toDomainModel(program);
@@ -106,28 +107,28 @@ class ProgramRepository {
         }
     }
 
-    async update(id, programData) {
+    async update(id, programData, options = {}) {
         try {
             const program = await this.Program.findByPk(id);
             if (!program) {
                 throw new Error(`Program with ID ${id} not found`);
             }
 
-            await program.update(programData);
+            await program.update(programData,{transaction: options.transaction});
             return this.toDomainModel(program);
         } catch (error) {
             throw new Error(`Failed to update program: ${error.message}`);
         }
     }
 
-    async delete(id) {
+    async delete(id, options = {}) {
         try {
             const program = await this.Program.findByPk(id);
             if (!program) {
                 throw new Error(`Program with ID ${id} not found`);
             }
 
-            await program.destroy();
+            await program.destroy({transaction: options.transaction});
             return true;
         } catch (error) {
             throw new Error(`Failed to delete program: ${error.message}`);

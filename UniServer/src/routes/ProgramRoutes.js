@@ -2,12 +2,14 @@ const express = require('express');
 const {checkPermission, auth} = require("../middleware/auth");
 const router = express.Router();
 const ProgramRepository = require("../Repositories/ProgramRepository");
+const LogRepository = require('../repositories/LogRepository');
 const ProgramService = require("../Services/ProgramService");
 const ProgramController = require("../Controllers/ProgramController");
 
 module.exports = (sequelize) => {
     const programRepository = new ProgramRepository(sequelize);
-    const programService = new ProgramService(programRepository);
+    const logRepository = new LogRepository(sequelize);
+    const programService = new ProgramService(programRepository, logRepository);
     const programController = new ProgramController(programService);
 
     router.post('/create', auth,

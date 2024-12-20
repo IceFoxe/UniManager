@@ -444,7 +444,7 @@ const DashboardLayout: React.FC = () => {
                         element={
                             <Box>
                                 <SectionHeader/>
-                                <Box sx={{px: 4}}>
+                                <Box sx={{px: 4, width: "100%", padding: '5px', margin: '0px' }}>
                                     <subItem.component/>
                                 </Box>
                             </Box>

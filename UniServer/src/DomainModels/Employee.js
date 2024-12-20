@@ -1,87 +1,50 @@
-const { DataTypes } = require('sequelize');
+class Employee {
+    constructor(data) {
+        this.id = data.employee_id;
+        this.position = data.position;
+        this.employmentDate = data.employment_date;
+        this._account = null;
+    }
 
-module.exports = (sequelize) => {
-    sequelize.define('Employee', {
-        employee_id: {
-            type: DataTypes.INTEGER,
-            primaryKey: true,
-            autoIncrement: true
-        },
-        account_id: {
-            type: DataTypes.INTEGER,
-            allowNull: false,
-            unique: true,
-            validate: {
-                notNull: {
-                    msg: 'Account ID is required'
-                },
-                isInt: {
-                    msg: 'Account ID must be an integer'
-                }
-            }
-        },
-        position: {
-            type: DataTypes.STRING(50),
-            allowNull: false,
-            defaultValue: "User",
-            validate: {
-                notNull: {
-                    msg: 'Position is required'
-                },
-                notEmpty: {
-                    msg: 'Position cannot be empty'
-                },
-                len: {
-                    args: [2, 50],
-                    msg: 'Position must be between 2 and 50 characters'
-                },
-                isIn: {
-                    args: [['User', 'Administrator', 'Teacher', 'Professor', 'Department Head', 'Dean', 'Staff']],
-                    msg: 'Invalid position specified'
-                }
-            }
-        },
-        employment_date: {
-            type: DataTypes.DATE,
-            allowNull: false,
-            defaultValue: DataTypes.NOW,
-            validate: {
-                notNull: {
-                    msg: 'Employment date is required'
-                },
-                isDate: {
-                    msg: 'Employment date must be a valid date'
-                },
-                isNotFuture(value) {
-                    if (value > new Date()) {
-                        throw new Error('Employment date cannot be in the future');
-                    }
-                }
-            }
-        },
-        created_at: {
-            type: DataTypes.DATE,
-            defaultValue: DataTypes.NOW,
-            validate: {
-                isDate: {
-                    msg: 'Created at must be a valid date'
-                }
-            }
-        }
-    }, {
-        tableName: 'employees',
-        timestamps: false,
-        indexes: [
-            {
-                unique: true,
-                fields: ['account_id']
-            },
-            {
-                fields: ['position']
-            },
-            {
-                fields: ['employment_date']
-            }
-        ],
-    });
-};
+    get account() {
+        return this._account;
+    }
+
+    set account(account) {
+        this._account = account;
+    }
+
+    get isAdministrator() {
+        return this.position === 'Administrator';
+    }
+
+    get isTeachingStaff() {
+        return ['Teacher', 'Professor', 'Department Head', 'Dean'].includes(this.position);
+    }
+
+    get employmentDuration() {
+        const today = new Date();
+        const startDate = new Date(this.employmentDate);
+        const diffTime = Math.abs(today - startDate);
+        const diffYears = Math.floor(diffTime / (1000 * 60 * 60 * 24 * 365));
+        return diffYears;
+    }
+
+    canApproveGrades() {
+        return this.isTeachingStaff || this.isAdministrator;
+    }
+
+    canManageUsers() {
+        return this.isAdministrator;
+    }
+
+    canAccessDepartmentRecords() {
+        return this.position === 'Department Head' || this.position === 'Dean' || this.isAdministrator;
+    }
+
+    hasPosition(position) {
+        return this.position === position;
+    }
+}
+
+module.exports = Employee;

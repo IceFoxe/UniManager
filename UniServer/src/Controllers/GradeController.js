@@ -5,7 +5,7 @@ class GradeController {
 
     async createGrade(req, res) {
         try {
-            const grade = await this.gradeService.createGrade(req.body);
+            const grade = await this.gradeService.createGrade(req.body, req.user);
             res.status(201).json(grade);
         } catch (error) {
             console.error('Failed to create grade:', error);
@@ -22,9 +22,9 @@ class GradeController {
         }
     }
 
-    async getGroupGrades(req, res) {
+    async getCourseGrades(req, res) {
         try {
-            const result = await this.gradeService.getGroupGrades(req.params.groupId);
+            const result = await this.gradeService.getGroupGrades(req.params.courseId);
             res.json(result);
         } catch (error) {
             res.status(500).json({ error: error.message });

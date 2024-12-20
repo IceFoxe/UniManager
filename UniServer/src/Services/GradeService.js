@@ -1,19 +1,38 @@
 class GradeService {
-    constructor(gradeRepository) {
+    constructor(gradeRepository, logRepository) {
         this.gradeRepository = gradeRepository;
+        this.logRepository = logRepository;
     }
 
-    async createGrade(gradeData) {
+    async createGrade(gradeData, userData) {
         if (!gradeData.student_id || !gradeData.group_id || !gradeData.value) {
             throw new Error('Required fields missing');
         }
 
-        // Validate grade value
         if (gradeData.value < 2.0 || gradeData.value > 5.5) {
             throw new Error('Grade value must be between 2.0 and 5.5');
         }
 
-        return await this.gradeRepository.create(gradeData);
+        const t = await this.gradeRepository.sequelize.transaction();
+        try {
+            const grade = await this.gradeRepository.create(gradeData, { transaction: t });
+
+            await this.logRepository.create({
+                account_id: userData.userId,
+                timestamp: new Date(),
+                action: 'CREATE',
+                table_name: 'grade',
+                record_id: grade.id,
+                old_values: '',
+                new_values: JSON.stringify(gradeData),
+            }, { transaction: t });
+
+            await t.commit();
+            return grade;
+        } catch (error) {
+            await t.rollback();
+            throw new Error(`Failed to create grade: ${error.message}`);
+        }
     }
 
     async getStudentGrades(studentId) {
@@ -76,7 +95,7 @@ class GradeService {
         return ((passingGrades.length / grades.length) * 100).toFixed(1);
     }
 
-    async updateGrade(id, gradeData) {
+    async updateGrade(id, gradeData, userData) {
         if (gradeData.value !== undefined) {
             if (gradeData.value < 2.0 || gradeData.value > 5.5) {
                 throw new Error('Grade value must be between 2.0 and 5.5');
@@ -85,11 +104,59 @@ class GradeService {
             gradeData.value = Math.round(gradeData.value * 2) / 2;
         }
 
-        return await this.gradeRepository.update(id, gradeData);
+        const t = await this.gradeRepository.sequelize.transaction();
+        try {
+            const oldGrade = await this.gradeRepository.findById(id);
+            if (!oldGrade) {
+                throw new Error('Grade not found');
+            }
+
+            const updatedGrade = await this.gradeRepository.update(id, gradeData, { transaction: t });
+
+            await this.logRepository.create({
+                account_id: userData.userId,
+                timestamp: new Date(),
+                action: 'UPDATE',
+                table_name: 'grade',
+                record_id: id,
+                old_values: JSON.stringify(oldGrade),
+                new_values: JSON.stringify(gradeData),
+            }, { transaction: t });
+
+            await t.commit();
+            return updatedGrade;
+        } catch (error) {
+            await t.rollback();
+            throw new Error(`Failed to update grade: ${error.message}`);
+        }
     }
 
-    async deleteGrade(id) {
-        return await this.gradeRepository.delete(id);
+    async deleteGrade(id, userData) {
+        const t = await this.gradeRepository.sequelize.transaction();
+        try {
+            const grade = await this.gradeRepository.findById(id);
+            if (!grade) {
+                throw new Error('Grade not found');
+            }
+
+            await this.gradeRepository.delete(id, { transaction: t });
+
+            await this.logRepository.create({
+                account_id: userData.userId,
+                timestamp: new Date(),
+                action: 'DELETE',
+                table_name: 'grade',
+                record_id: id,
+                old_values: JSON.stringify(grade),
+                new_values: '',
+            }, { transaction: t });
+
+            await t.commit();
+            return true;
+        } catch (error) {
+            await t.rollback();
+            throw new Error(`Failed to delete grade: ${error.message}`);
+        }
     }
 }
 

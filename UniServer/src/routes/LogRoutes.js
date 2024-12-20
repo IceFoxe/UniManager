@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 
 module.exports = (sequelize) => {
+
     const AuditLogRepository = require('../repositories/LogRepository');
     const AuditLogService = require('../services/LogService');
     const AuditLogController = require('../controllers/LogController');

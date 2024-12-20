@@ -10,7 +10,7 @@ id = '66129ef1-bc78-4e97-b9c6-f1245184ab20'
 type = 'JSON'
 raw = '''
 {
-  "name": "Wydzial Mechaniki i Budowy Maszyn",
-  "code": "W07",
+  "name": "Wydzial Informatyki i Zarzadzania",
+  "code": "W04",
 }'''
 ```

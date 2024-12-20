@@ -5,7 +5,7 @@ class CourseController {
 
     async createCourse(req, res) {
         try {
-            const course = await this.courseService.createCourse(req.body);
+            const course = await this.courseService.createCourse(req.body, req.user);
             res.status(201).json(course);
         } catch (error) {
             console.error('Failed to create course:', error);
@@ -83,3 +83,5 @@ class CourseController {
         }
     }
 }
+
+module.exports = CourseController;

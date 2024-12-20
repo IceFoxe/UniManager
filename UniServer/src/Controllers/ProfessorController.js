@@ -26,7 +26,7 @@ class ProfessorController {
 
     async createProfessor(req, res) {
         try {
-            const professor = await this.professorService.createProfessor(req.body);
+            const professor = await this.professorService.createProfessor(req.body, req.user);
             res.status(201).json(professor);
         } catch (error) {
             res.status(400).json({ error: error.message });

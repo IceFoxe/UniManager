@@ -1,8 +1,7 @@
 ```toml
 name = 'Search'
-description = 'Wyszukaj prowadzącego po filtrach'
+description = 'wyszukaj po filtrach'
 method = 'GET'
-url = '{{baseUrl}}api/'
-sortWeight = 1500000
-id = '25f4ad33-c0f0-4a15-9363-0ab52ccaa8e7'
+sortWeight = 1250000
+id = '0a139914-af1d-42b6-94a9-a474081651d4'
 ```

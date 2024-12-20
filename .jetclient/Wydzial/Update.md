@@ -8,13 +8,13 @@ id = '92e78cc6-bfd9-4faf-a64a-68dc3ec09ee8'
 
 [[pathVariables]]
 key = 'id'
-value = '1'
+value = '2'
 
 [body]
 type = 'JSON'
 raw = '''
 {
-  "name": "Wydział Informatyki i Telekomunikacji",
-  "code": "W4",
+  "name": "Wydzial Informatyki i Zarzadzania",
+  "code": "W8N",
 }'''
 ```

@@ -1,3 +1,7 @@
+const Student = require('../DomainModels/Student');
+const Grade = require('../DomainModels/Grade');
+
+const Account = require('../DomainModels/Account');
 class GradeRepository {
     constructor(sequelize) {
         this.sequelize = sequelize;
@@ -14,29 +18,18 @@ class GradeRepository {
             grade.student = new Student(plainData.Student);
         }
 
-        if (plainData.Group) {
-            grade.group = new Group(plainData.Group);
-        }
 
         return grade;
     }
 
-    async create(gradeData) {
+    async create(gradeData, options = {}) {
         const t = await this.sequelize.transaction();
         try {
-            // Validate student exists
             const student = await this.Student.findByPk(gradeData.student_id);
             if (!student) {
                 throw new Error('Student not found');
             }
 
-            // Validate group exists
-            const group = await this.Group.findByPk(gradeData.group_id);
-            if (!group) {
-                throw new Error('Group not found');
-            }
-
-            // Round grade to nearest 0.5
             const roundedGrade = Math.round(gradeData.value * 2) / 2;
 
             const grade = await this.Grade.create({
@@ -46,7 +39,7 @@ class GradeRepository {
                 date: gradeData.date || new Date(),
                 createdAt: new Date(),
                 updatedAt: new Date()
-            }, { transaction: t });
+            }, { transaction: options.transaction });
 
             await t.commit();
             return this.toDomainModel(grade);
@@ -65,10 +58,6 @@ class GradeRepository {
                         model: this.Student,
                         required: true
                     },
-                    {
-                        model: this.Group,
-                        required: true
-                    }
                 ],
                 order: [['date', 'DESC']]
             });
@@ -108,7 +97,7 @@ class GradeRepository {
         }
     }
 
-    async update(id, gradeData) {
+    async update(id, gradeData, options = {}) {
         try {
             const grade = await this.Grade.findByPk(id);
             if (!grade) {
@@ -117,7 +106,8 @@ class GradeRepository {
 
             await grade.update({
                 ...gradeData,
-                updatedAt: new Date()
+                updatedAt: new Date(),
+                transaction: options.transaction
             });
 
             return this.toDomainModel(grade);
@@ -126,14 +116,14 @@ class GradeRepository {
         }
     }
 
-    async delete(id) {
+    async delete(id, options = {}) {
         try {
             const grade = await this.Grade.findByPk(id);
             if (!grade) {
                 throw new Error(`Grade with ID ${id} not found`);
             }
 
-            await grade.destroy();
+            await grade.destroy({transaction: options.transaction});
             return true;
         } catch (error) {
             throw new Error(`Failed to delete grade: ${error.message}`);

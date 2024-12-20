@@ -5,7 +5,7 @@ class ProgramController {
 
     async createProgram(req, res) {
         try {
-            const program = await this.programService.createProgram(req.body);
+            const program = await this.programService.createProgram(req.body, req.user);
             res.status(201).json(program);
         } catch (error) {
             console.error('Failed to create program:', error);

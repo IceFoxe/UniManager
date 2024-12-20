@@ -1,9 +1,13 @@
+const Student = require('../DomainModels/Student');
+const Program = require('../DomainModels/Program');
+const Professor = require('../DomainModels/Professor');
+
 class CourseRepository {
     constructor(sequelize) {
         this.sequelize = sequelize;
         this.Course = sequelize.models.Course;
         this.Program = sequelize.models.Program;
-        this.Teacher = sequelize.models.Teacher;
+        this.Professor = sequelize.models.Professor;
         this.Student = sequelize.models.Student;
     }
 
@@ -15,8 +19,8 @@ class CourseRepository {
             course.program = new Program(plainData.Program);
         }
 
-        if (plainData.Teacher) {
-            course.teacher = new Teacher(plainData.Teacher);
+        if (plainData.Professor) {
+            course.Professor = new Professor(plainData.Professor);
         }
 
         if (plainData.Students) {
@@ -31,7 +35,7 @@ class CourseRepository {
         try {
             const course = await this.Course.create({
                 program_id: courseData.program_id,
-                teacher_id: courseData.teacher_id,
+                Professor_id: courseData.Professor_id,
                 name: courseData.name,
                 code: courseData.code,
                 credits: courseData.credits,
@@ -61,9 +65,9 @@ class CourseRepository {
                         required: true,
                     },
                     {
-                        model: this.Teacher,
+                        model: this.Professor,
                         required: true,
-                        attributes: ['teacher_id', 'first_name', 'last_name']
+                        attributes: ['Professor_id', 'first_name', 'last_name']
                     }
                 ]
             });
@@ -79,7 +83,7 @@ class CourseRepository {
     }
 
     async getAll(options = {}) {
-        const { page = 1, limit = 10, semester, mandatory } = options;
+        const { page = 1, limit = 10} = options;
         try {
             const queryOptions = {
                 include: [
@@ -88,18 +92,14 @@ class CourseRepository {
                         required: true,
                     },
                     {
-                        model: this.Teacher,
+                        model: this.Professor,
                         required: true,
-                        attributes: ['teacher_id', 'first_name', 'last_name']
+                        attributes: ['Professor_id', 'first_name', 'last_name']
                     }
                 ],
-                where: {},
                 limit,
                 offset: (page - 1) * limit
             };
-
-            if (semester) queryOptions.where.semester = semester;
-            if (mandatory !== undefined) queryOptions.where.mandatory = mandatory;
 
             const { rows, count } = await this.Course.findAndCountAll(queryOptions);
 
@@ -125,9 +125,9 @@ class CourseRepository {
                         required: true,
                     },
                     {
-                        model: this.Teacher,
+                        model: this.Professor,
                         required: true,
-                        attributes: ['teacher_id', 'first_name', 'last_name']
+                        attributes: ['Professor_id', 'first_name', 'last_name']
                     }
                 ]
             };
@@ -196,10 +196,10 @@ class CourseRepository {
         }
     }
 
-    async getCoursesByTeacher(teacherId) {
+    async getCoursesByProfessor(ProfessorId) {
         try {
             const { rows, count } = await this.Course.findAndCountAll({
-                where: { teacher_id: teacherId },
+                where: { Professor_id: ProfessorId },
                 include: [{
                     model: this.Program,
                     required: true
@@ -211,7 +211,8 @@ class CourseRepository {
                 total: count
             };
         } catch (error) {
-            throw new Error(`Failed to fetch teacher courses: ${error.message}`);
+            throw new Error(`Failed to fetch Professor courses: ${error.message}`);
         }
     }
 }
+module.exports = CourseRepository;

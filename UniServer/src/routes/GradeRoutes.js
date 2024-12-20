@@ -4,10 +4,12 @@ const router = express.Router();
 const GradeRepository = require('../Repositories/GradeRepository')
 const GradeService = require('../Services/GradeService')
 const GradeController = require('../Controllers/GradeController')
+const LogRepository = require("../Repositories/LogRepository");
 
 module.exports = (sequelize) => {
     const gradeRepository = new GradeRepository(sequelize);
-    const gradeService = new GradeService(gradeRepository);
+    const logRepository = new LogRepository(sequelize);
+    const gradeService = new GradeService(gradeRepository, logRepository);
     const gradeController = new GradeController(gradeService);
     
     router.post('/create',  auth,
@@ -18,9 +20,9 @@ module.exports = (sequelize) => {
          checkPermission(['admin', 'professor', 'student']), (req, res) =>
             gradeController.getStudentGrades(req, res));
     
-    router.get('/group/:groupId',  auth,
+    router.get('/course/:courseId',  auth,
          checkPermission(['admin', 'professor']), (req, res) =>
-            gradeController.getGroupGrades(req, res));
+            gradeController.getCourseGrades(req, res));
     
     router.put('/:id', auth,
         checkPermission(['admin', 'professor']), (req, res) =>

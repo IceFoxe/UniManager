@@ -80,7 +80,7 @@ class StudentService {
             throw new Error('Required fields missing');
         }
         const t = await this.studentRepository.sequelize.transaction();
-        try{
+        try {
             const login = `${studentData.first_name.slice(0, 3).toLowerCase()}${studentData.last_name.slice(0, 3).toLowerCase()}${studentData.student_number.slice(2, 6)}`;
             const acc = await this.accountRepository.create({
                 login: login,
@@ -89,6 +89,16 @@ class StudentService {
                 first_name: studentData.first_name,
                 last_name: studentData.last_name,
                 role: 'Student',
+            }, {transaction: t});
+
+            const accountLog = await this.logRepository.create({
+                account_id: userData.userId,
+                timestamp: new Date(),
+                action: 'CREATE',
+                table_name: 'account',
+                record_id: acc.id,
+                old_values: '',
+                new_values: JSON.stringify(studentData),
             }, {transaction: t});
 
             const student = await this.studentRepository.create( {
@@ -103,7 +113,7 @@ class StudentService {
                 semester: studentData.semester || 1
             }, {transaction: t});
 
-            const log = await this.logRepository.create({
+            const studentLog = await this.logRepository.create({
                 account_id: userData.userId,
                 timestamp: new Date(),
                 action: 'CREATE',
@@ -114,10 +124,126 @@ class StudentService {
             }, {transaction: t});
             t.commit();
             return {id: student.id};
-        }
-        catch(error){
+        } catch (error) {
             t.rollback();
             throw new Error(`Failed to create student: ${error.message}`);
+        }
+    }
+
+    async deleteStudentById(id, userData) {
+        const t = await this.studentRepository.sequelize.transaction();
+        try {
+            const student = await this.studentRepository.findById(id, {transaction: t});
+            if (!student) {
+                throw new Error('Student not found');
+            }
+
+            const oldValues = JSON.stringify(student);
+
+            await this.studentRepository.delete(id, {transaction: t});
+            await this.logRepository.create({
+                account_id: userData.userId,
+                timestamp: new Date(),
+                action: 'DELETE',
+                table_name: 'student',
+                record_id: id,
+                old_values: oldValues,
+                new_values: '',
+            }, {transaction: t});
+
+            await this.accountRepository.delete(student.account.id, {transaction: t});
+            await this.logRepository.create({
+                account_id: userData.userId,
+                timestamp: new Date(),
+                action: 'DELETE',
+                table_name: 'account',
+                record_id: student.account_id,
+                old_values: oldValues,
+                new_values: '',
+            }, {transaction: t});
+
+            await t.commit();
+            return {success: true};
+        } catch (error) {
+            await t.rollback();
+            throw new Error(`Failed to delete student: ${error.message}`);
+        }
+    }
+
+    async updateStudentById(id, updateData, userData) {
+        const t = await this.studentRepository.sequelize.transaction();
+        try {
+            const student = await this.studentRepository.findById(id, {transaction: t});
+            if (!student) {
+                throw new Error('Student not found');
+            }
+            
+            if (userData.role === 'student' && userData.userId !== student.account_id) {
+                throw new Error('Unauthorized to update this student record');
+            }
+
+            const oldValues = JSON.stringify(student);
+            const updatedStudent = await this.studentRepository.update(id, updateData, {transaction: t});
+
+            await this.logRepository.create({
+                account_id: userData.userId,
+                timestamp: new Date(),
+                action: 'UPDATE',
+                table_name: 'student',
+                record_id: id,
+                old_values: oldValues,
+                new_values: JSON.stringify(updateData),
+            }, {transaction: t});
+
+            await t.commit();
+            return updatedStudent;
+        } catch (error) {
+            await t.rollback();
+            throw new Error(`Failed to update student: ${error.message}`);
+        }
+    }
+
+    async sudoUpdateStudentById(id, updateData, userData) {
+        const t = await this.studentRepository.sequelize.transaction();
+        try {
+            const student = await this.studentRepository.findById(id, {transaction: t});
+            if (!student) {
+                throw new Error('Student not found');
+            }
+
+            const oldValues = JSON.stringify(student);
+
+            // Update both student and account information
+            const updatedStudent = await this.studentRepository.update(id, updateData.student, {transaction: t});
+            await this.logRepository.create({
+                account_id: userData.userId,
+                timestamp: new Date(),
+                action: 'SUDO_UPDATE',
+                table_name: 'student',
+                record_id: id,
+                old_values: oldValues,
+                new_values: JSON.stringify(updateData.student),
+            }, {transaction: t});
+
+            if (updateData.account) {
+                const oldAccountValues = JSON.stringify(await this.accountRepository.findById(student.account_id));
+                await this.accountRepository.update(student.account_id, updateData.account, {transaction: t});
+                await this.logRepository.create({
+                    account_id: userData.userId,
+                    timestamp: new Date(),
+                    action: 'SUDO_UPDATE',
+                    table_name: 'account',
+                    record_id: student.account_id,
+                    old_values: oldAccountValues,
+                    new_values: JSON.stringify(updateData.account),
+                }, {transaction: t});
+            }
+
+            await t.commit();
+            return updatedStudent;
+        } catch (error) {
+            await t.rollback();
+            throw new Error(`Failed to sudo update student: ${error.message}`);
         }
     }
 }

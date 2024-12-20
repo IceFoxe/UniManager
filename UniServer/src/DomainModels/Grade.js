@@ -4,7 +4,6 @@ class Grade {
         this.value = data.value;
         this.date = data.date;
         this._student = null;
-        this._group = null;
     }
 
     get student() {
@@ -13,14 +12,6 @@ class Grade {
 
     set student(student) {
         this._student = student;
-    }
-
-    get group() {
-        return this._group;
-    }
-
-    set group(group) {
-        this._group = group;
     }
 
     isPassing() {

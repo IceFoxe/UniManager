@@ -1,6 +1,6 @@
 const {Op} = require('sequelize');
 
-class AuditLogRepository {
+class LogRepository {
     constructor(sequelize) {
         this.AuditLog = sequelize.models.AuditLog;
     }
@@ -78,4 +78,4 @@ class AuditLogRepository {
     }
 }
 
-module.exports = AuditLogRepository;
+module.exports = LogRepository;

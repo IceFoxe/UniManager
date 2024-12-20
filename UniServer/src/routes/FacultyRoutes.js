@@ -1,14 +1,16 @@
 const express = require('express');
 const {auth, checkPermission} = require("../middleware/auth");
+const LogRepository = require("../Repositories/LogRepository");
 const router = express.Router();
 
 module.exports = (sequelize) => {
+
     const FacultyRepository = require('../repositories/facultyRepository');
     const FacultyService = require('../services/facultyService');
     const FacultyController = require('../controllers/facultyController');
-
+    const logRepository = new LogRepository(sequelize);
     const repository = new FacultyRepository(sequelize);
-    const service = new FacultyService(repository);
+    const service = new FacultyService(repository, logRepository);
     const controller = new FacultyController(service);
     router.get('/:id/programs', auth,
         checkPermission(['admin', 'professor', 'student']),(req, res) =>

@@ -42,7 +42,7 @@ class FacultyController {
 
   async createFaculty(req, res) {
     try {
-      const faculty = await this.facultyService.createFaculty(req.body);
+      const faculty = await this.facultyService.createFaculty(req.body, req.user);
       res.status(201).json(faculty);
     } catch (error) {
       console.error('Failed to create faculty:', error);
@@ -52,7 +52,7 @@ class FacultyController {
 
   async updateFaculty(req, res) {
     try {
-      const faculty = await this.facultyService.updateFaculty(req.params.id, req.body);
+      const faculty = await this.facultyService.updateFaculty(req.params.id, req.body, req.user);
       if (!faculty) {
         return res.status(404).json({ error: 'Faculty not found' });
       }
