@@ -20,13 +20,16 @@ async function startApp() {
         await initializeDatabase();
 
         const app = express();
+        app.use(cors({
+            origin: true,
+            credentials: true,
+            methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+            allowedHeaders: ['Content-Type', 'Authorization', 'Origin', 'Accept'],
+            exposedHeaders: ['Content-Length', 'Authorization']
+        }));
+
         app.use(bodyParser.json());
         app.use(bodyParser.urlencoded({extended: true}));
-        app.use(cors({
-            origin: 'http://localhost:5173',
-            methods: ['GET', 'POST', 'PUT', 'DELETE'],
-            credentials: true,
-        }));
 
         app.use('/api/students', studentRoutes);
         app.use('/api/programs', programRoutes);

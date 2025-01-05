@@ -84,6 +84,7 @@ class StudentService {
             const login = `${studentData.first_name.slice(0, 3).toLowerCase()}${studentData.last_name.slice(0, 3).toLowerCase()}${studentData.student_number.slice(2, 6)}`;
             const acc = await this.accountRepository.create({
                 login: login,
+                student_number: studentData.student_number,
                 email: `${studentData.student_number}@gmail.com`,
                 password_hash: await bcrypt.hash(studentData.student_number, 10),
                 first_name: studentData.first_name,
@@ -213,16 +214,16 @@ class StudentService {
 
             const oldValues = JSON.stringify(student);
 
-            // Update both student and account information
-            const updatedStudent = await this.studentRepository.update(id, updateData.student, {transaction: t});
+            const studentUpdateData = updateData;
+            const updatedStudent = await this.studentRepository.update(id, studentUpdateData, {transaction: t});
+
             await this.logRepository.create({
                 account_id: userData.userId,
                 timestamp: new Date(),
-                action: 'SUDO_UPDATE',
+                action: 'UPDATE',
                 table_name: 'student',
                 record_id: id,
-                old_values: oldValues,
-                new_values: JSON.stringify(updateData.student),
+                new_values: JSON.stringify(studentUpdateData),
             }, {transaction: t});
 
             if (updateData.account) {
@@ -231,7 +232,7 @@ class StudentService {
                 await this.logRepository.create({
                     account_id: userData.userId,
                     timestamp: new Date(),
-                    action: 'SUDO_UPDATE',
+                    action: 'UPDATE',
                     table_name: 'account',
                     record_id: student.account_id,
                     old_values: oldAccountValues,
@@ -241,6 +242,7 @@ class StudentService {
 
             await t.commit();
             return updatedStudent;
+
         } catch (error) {
             await t.rollback();
             throw new Error(`Failed to sudo update student: ${error.message}`);

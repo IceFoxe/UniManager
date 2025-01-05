@@ -10,7 +10,7 @@ interface AuthTokens {
   accessToken: string;
   refreshToken: string;
 }
-type UserRole = 'employee' | 'professor' | 'student';
+type UserRole = 'admin' | 'professor' | 'student';
 type RouteSection = 'e' | 'a' | 'k' | 's' | 'p' | 'd';
 
 const decodeToken = (token: string): DecodedToken | null => {
@@ -54,12 +54,12 @@ export const isTokenValid = (token?: string | null): boolean => {
 // Route definitions
 const ROUTES = {
   defaultRoutes: {
-    employee: '/panel_uzytkownika/e/overview',
+    admin: '/panel_uzytkownika/e/overview',
     professor: '/panel_uzytkownika/p/overview',
     student: '/panel_uzytkownika/d/overview'
   },
   allowedSections: {
-    employee: ['e', 'a', 'k', 's'] as RouteSection[],
+    admin: ['e', 'a', 'k', 's'] as RouteSection[],
     professor: ['p', 'k', 's'] as RouteSection[],
     student: ['d', 'k', 's'] as RouteSection[]
   }

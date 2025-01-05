@@ -144,15 +144,6 @@ class StudentRepository {
                         required: true,
                         attributes: ['first_name', 'last_name', 'account_id']
                     },
-                    {
-                        model: this.Program,
-                        required: true,
-                        attributes: ['id', 'name', 'code'],
-                        include: [{
-                            model: this.Faculty,
-                            required: true
-                        }]
-                    }
                 ],
                 attributes: ['student_id', 'student_number', 'account_id', 'status']
             });
@@ -232,9 +223,7 @@ class StudentRepository {
             }, {
                 transaction: options.transaction
             });
-
-            const updatedStudent = await this.findById(studentId);
-            return this.toDomainModel(updatedStudent);
+            return student;
         } catch (error) {
             throw new Error(`Failed to update student: ${error.message}`);
         }

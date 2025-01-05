@@ -95,15 +95,12 @@ const Login: React.FC = () => {
             if (response.data.status === 'success' && response.data.data) {
                 const { accessToken, refreshToken, user } = response.data.data;
 
-                // Store tokens
                 localStorage.setItem('authToken', accessToken);
                 localStorage.setItem('refreshToken', refreshToken);
                 localStorage.setItem('user', JSON.stringify(user));
 
-                // Set default authorization header
                 axios.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
 
-                // Redirect to dashboard
                 const defaultRoutes = {
                     employee: '/panel_uzytkownika/e/overview',
                     professor: '/panel_uzytkownika/p/overview',

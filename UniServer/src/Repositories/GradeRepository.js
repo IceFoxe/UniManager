@@ -2,6 +2,7 @@ const Student = require('../DomainModels/Student');
 const Grade = require('../DomainModels/Grade');
 
 const Account = require('../DomainModels/Account');
+
 class GradeRepository {
     constructor(sequelize) {
         this.sequelize = sequelize;
@@ -11,7 +12,7 @@ class GradeRepository {
     }
 
     toDomainModel(dbModel) {
-        const plainData = dbModel.get({ plain: true });
+        const plainData = dbModel.get({plain: true});
         const grade = new Grade(plainData);
 
         if (plainData.Student) {
@@ -34,12 +35,13 @@ class GradeRepository {
 
             const grade = await this.Grade.create({
                 student_id: gradeData.student_id,
-                group_id: gradeData.group_id,
+                group_id: gradeData.course_id,
                 value: roundedGrade,
+                description: gradeData.description,
                 date: gradeData.date || new Date(),
                 createdAt: new Date(),
                 updatedAt: new Date()
-            }, { transaction: options.transaction });
+            }, {transaction: options.transaction});
 
             await t.commit();
             return this.toDomainModel(grade);
@@ -51,8 +53,8 @@ class GradeRepository {
 
     async findByStudentId(studentId) {
         try {
-            const { rows, count } = await this.Grade.findAndCountAll({
-                where: { student_id: studentId },
+            const {rows, count} = await this.Grade.findAndCountAll({
+                where: {student_id: studentId},
                 include: [
                     {
                         model: this.Student,
@@ -71,10 +73,30 @@ class GradeRepository {
         }
     }
 
+    async findById(Id) {
+        const numericId = parseInt(Id, 10);
+
+        if (isNaN(numericId)) {
+            throw new Error('Invalid ID format - must be a number');
+        }
+
+        try {
+            const grade = await this.Grade.findByPk(numericId);
+
+            if (!grade) {
+                return null;
+            }
+
+            return this.toDomainModel(grade);
+        } catch (error) {
+            throw new Error(`Failed to fetch student grade: ${error.message}`);
+        }
+    }
+
     async findByGroupId(groupId) {
         try {
-            const { rows, count } = await this.Grade.findAndCountAll({
-                where: { group_id: groupId },
+            const {rows, count} = await this.Grade.findAndCountAll({
+                where: {group_id: groupId},
                 include: [
                     {
                         model: this.Student,

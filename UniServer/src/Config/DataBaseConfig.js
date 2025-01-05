@@ -1,7 +1,7 @@
 const { Sequelize, DataTypes } = require('sequelize');
 const { applyExtraSetup } = require('./AdditionalSetup');
 
-const sequelize = new Sequelize('UniProj', 'aver', 'pepsi', {
+const sequelize = new Sequelize('UniProject', 'aver', 'pepsi', {
   host: 'localhost',
   dialect: 'mssql',
   port: 1433,

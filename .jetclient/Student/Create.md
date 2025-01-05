@@ -10,10 +10,10 @@ id = 'fad76c65-de36-4a88-a64e-cf7cee4a4221'
 type = 'JSON'
 raw = '''
 {
-  "first_name": "Jakub",
-  "last_name": "Grych",
-  "student_number": "276897",
-  "program_id": 1,
+  "first_name": "Gabriela",
+  "last_name": "Kania",
+  "student_number": "274583",
+  "program_id": 4,
   "semester": 1,
   "status": "Active",
   "enrollment_date": "2024-01-15",

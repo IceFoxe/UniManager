@@ -38,6 +38,9 @@ import OverviewProfessor from '../Components/views/Pulpit/Prowadzacy/Overview';
 import OverviewEmployee from '../Components/views/Pulpit/Pracownik/AdminDashboard';
 import Performance from '../Components/views/Pulpit/Student/Courses.tsx';
 import Grades from '../Components/views/Pulpit/Student/Grades.tsx';
+import Faculties from '../Components/views/Pulpit/Faculties.tsx';
+import Programs from '../Components/views/Pulpit/Programs.tsx';
+import Courses from '../Components/views/Pulpit/Courses.tsx';
 import TrendAnalysis from '../Components/views/Analityka/TrendAnalysis';
 import UserInsights from '../Components/views/Analityka/UserInsights';
 import ConversionRates from '../Components/views/Analityka/ConversionRates';
@@ -66,6 +69,7 @@ type SubMenus = {
 const theme = createTheme(darkTheme);
 
 const DashboardLayout: React.FC = () => {
+    console.log('DashboardLayout component mounted');
     const [user, setUser] = useState<User | null>(null);
     const [isSubMenuOpen, setIsSubMenuOpen] = useState(true);
     const [mobileOpen, setMobileOpen] = useState(false);
@@ -75,10 +79,8 @@ const DashboardLayout: React.FC = () => {
     const location = useLocation();
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
-    // Get active menu and submenu from URL
     const getActiveMenusFromPath = () => {
         const path = location.pathname.split('/').filter(Boolean);
-        // Skip "panel_uzytkownika" in the path
         const relevantPath = path.slice(path.indexOf('panel_uzytkownika') + 1);
         const mainMenu = relevantPath[0]?.toUpperCase() as MainMenuKey || 'D';
         const subMenu = relevantPath[1] || 'overview';
@@ -86,7 +88,7 @@ const DashboardLayout: React.FC = () => {
     };
 
     const {mainMenu: activeMenu, subMenu: activeSubMenu} = getActiveMenusFromPath();
-    type UserRole = 'Professor' | 'Student' | 'Employee';
+    type UserRole = 'Professor' | 'Student' | 'Admin';
     useEffect(() => {
         const checkUserRole = () => {
             const token = localStorage.getItem('authToken');
@@ -94,13 +96,13 @@ const DashboardLayout: React.FC = () => {
                 try {
                     const decodedToken = JSON.parse(atob(token.split('.')[1])) as { role: UserRole };
                     setUser({role: decodedToken.role.toLowerCase() as 'student' | 'professor' | 'admin'});
-
+                    console.log(decodedToken.role);
                     const defaultRoutes = {
                         Professor: '/panel_uzytkownika/p/overview',
                         Student: '/panel_uzytkownika/d/overview',
-                        Employee: '/panel_uzytkownika/e/overview'
+                        Admin: '/panel_uzytkownika/e/overview'
                     };
-
+                    console.log(decodedToken.role);
                     if (location.pathname === '/panel_uzytkownika') {
                         navigate(defaultRoutes[decodedToken.role] || '/panel_uzytkownika/d/overview');
                     }
@@ -129,7 +131,7 @@ const DashboardLayout: React.FC = () => {
                     {key: 'K' as MainMenuKey, label: 'Dla Studentów', icon: PeopleIcon},
                     {key: 'S' as MainMenuKey, label: 'Ustawienia', icon: SettingsIcon}
                 ];
-            case 'employee':
+            case 'admin':
                 return [
                     {key: 'E' as MainMenuKey, label: 'Pulpit', icon: DashboardIcon},
                     {key: 'A' as MainMenuKey, label: 'Wyszukiwarka', icon: AnalyticsIcon},
@@ -166,9 +168,9 @@ const DashboardLayout: React.FC = () => {
             {label: 'Widok Główny', key: 'overview', component: OverviewEmployee},
             {label: 'Pracownicy', key: 'tasks', component: Performance},
             {label: 'Studenci', key: 'users', component: StudentSearch},
-            {label: 'Wydziały', key: 'reports', component: Grades},
-            {label: 'Kierunki', key: 'kierunki', component: Grades},
-            {label: 'Kursy', key: 'kursy', component: Grades},
+            {label: 'Wydziały', key: 'wydzialy', component: Faculties},
+            {label: 'Kierunki', key: 'kierunki', component: Programs},
+            {label: 'Kursy', key: 'kursy', component: Courses},
             {label: 'Mail', key: 'mail', component: Grades}
         ],
         A: [
@@ -452,6 +454,7 @@ const DashboardLayout: React.FC = () => {
                     />
                 ))
             ))}
+
         </Routes>
     );
 

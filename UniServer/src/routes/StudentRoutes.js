@@ -30,10 +30,10 @@ module.exports = (sequelize) => {
     router.delete('/delete/:id', authMiddleware.auth,
         authMiddleware.checkPermission(['admin']), (req, res) =>
             studentController.delStudentById(req, res));
-    router.get('/update/:id', authMiddleware.auth,
+    router.put('/update/:id', authMiddleware.auth,
         authMiddleware.checkPermission(['admin', 'student']), (req, res) =>
             studentController.updateStudentById(req, res));
-    router.get('/sudoUpdate/:id', authMiddleware.auth,
+    router.put('/sudoUpdate/:id', authMiddleware.auth,
         authMiddleware.checkPermission(['admin']), (req, res) =>
             studentController.sudoUpdateStudentById(req, res));
 

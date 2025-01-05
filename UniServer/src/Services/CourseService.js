@@ -24,7 +24,7 @@ class CourseService {
             }, { transaction: t });
 
             await t.commit();
-            return course;
+            //return course;
         } catch (error) {
             await t.rollback();
             throw new Error(`Failed to create course: ${error.message}`);

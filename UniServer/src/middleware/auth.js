@@ -17,7 +17,8 @@ const auth = (req, res, next) => {
 
 const checkPermission = (requiredRole) => {
     return (req, res, next) => {
-        if (!req.user || !req.user.role ===requiredRole ) {
+        const role = req.user.role.toLowerCase()
+        if (!req.user || !requiredRole.includes(role) ) {
             return res.status(403).json({ error: 'Insufficient permissions' });
         }
         next();

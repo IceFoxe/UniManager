@@ -5,7 +5,7 @@ class GradeService {
     }
 
     async createGrade(gradeData, userData) {
-        if (!gradeData.student_id || !gradeData.group_id || !gradeData.value) {
+        if (!gradeData.student_id || !gradeData.course_id || !gradeData.value) {
             throw new Error('Required fields missing');
         }
 
@@ -100,7 +100,7 @@ class GradeService {
             if (gradeData.value < 2.0 || gradeData.value > 5.5) {
                 throw new Error('Grade value must be between 2.0 and 5.5');
             }
-            // Round to nearest 0.5
+
             gradeData.value = Math.round(gradeData.value * 2) / 2;
         }
 

@@ -1,6 +1,6 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const { Sequelize } = require('sequelize');
+const { Sequelize, Op } = require('sequelize');
 const { models } = require('../Config/DataBaseConfig');
 
 class AuthController {
@@ -35,7 +35,12 @@ class AuthController {
 
         try {
             const account = await models.Account.findOne({
-                where: Sequelize.literal(`(login = '${login}' OR email = '${login}')`)
+                where: {
+                    [Op.or]: [
+                        { login: login },
+                        { email: login }
+                    ]
+                }
             });
 
             if (!account) {

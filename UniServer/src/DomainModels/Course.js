@@ -35,3 +35,5 @@ class Course {
         this._students = students;
     }
 }
+
+module.exports = Course;

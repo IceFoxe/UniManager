@@ -22,7 +22,6 @@ function applyExtraSetup(sequelize) {
         foreignKey: 'account_id'
     });
 
-    // Employee relationships
     Employee.hasOne(Professor, {
         foreignKey: 'employee_id'
     });
@@ -37,7 +36,6 @@ function applyExtraSetup(sequelize) {
         foreignKey: 'facultyId'
     });
 
-    // Program relationships
     Program.hasMany(Course, {
         foreignKey: 'program_id'
     });
@@ -68,7 +66,7 @@ function applyExtraSetup(sequelize) {
         foreignKey: 'course_id'
     });
 
-    // Student relationships
+
     Student.hasMany(Grade, {
         foreignKey: 'student_id'
     });

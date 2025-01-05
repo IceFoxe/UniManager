@@ -33,7 +33,7 @@ class GradeController {
 
     async updateGrade(req, res) {
         try {
-            const grade = await this.gradeService.updateGrade(req.params.id, req.body);
+            const grade = await this.gradeService.updateGrade(req.params.id, req.body, req.user);
             res.json(grade);
         } catch (error) {
             res.status(500).json({ error: error.message });

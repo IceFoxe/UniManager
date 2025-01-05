@@ -38,7 +38,7 @@ interface User {
   firstName: string;
   lastName: string;
   email: string;
-  role: 'student' | 'professor' | 'employee';
+  role: 'student' | 'professor' | 'Admin';
   studentInfo?: StudentInfo;
 }
 
@@ -230,7 +230,7 @@ const AdminDashboard = () => {
             >
               <MenuItem value="student">Student</MenuItem>
               <MenuItem value="professor">Professor</MenuItem>
-              <MenuItem value="employee">Employee</MenuItem>
+              <MenuItem value="admin">Admin</MenuItem>
             </Select>
           </FormControl>
 

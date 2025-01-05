@@ -1,5 +1,6 @@
 const Student = require('../DomainModels/Student');
 const Program = require('../DomainModels/Program');
+const Course = require('../DomainModels/Course');
 const Professor = require('../DomainModels/Professor');
 
 class CourseRepository {
@@ -35,7 +36,7 @@ class CourseRepository {
         try {
             const course = await this.Course.create({
                 program_id: courseData.program_id,
-                Professor_id: courseData.Professor_id,
+                teacher_id: courseData.teacher_id,
                 name: courseData.name,
                 code: courseData.code,
                 credits: courseData.credits,
@@ -91,11 +92,6 @@ class CourseRepository {
                         model: this.Program,
                         required: true,
                     },
-                    {
-                        model: this.Professor,
-                        required: true,
-                        attributes: ['Professor_id', 'first_name', 'last_name']
-                    }
                 ],
                 limit,
                 offset: (page - 1) * limit
@@ -124,11 +120,6 @@ class CourseRepository {
                         model: this.Program,
                         required: true,
                     },
-                    {
-                        model: this.Professor,
-                        required: true,
-                        attributes: ['Professor_id', 'first_name', 'last_name']
-                    }
                 ]
             };
 

@@ -30,7 +30,7 @@ const studentApi = {
       limit: params.limit.toString()
     });
     console.log(`${API_BASE_URL}/students?${queryParams}`);
-    const response = await fetch(`${API_BASE_URL}/students?${queryParams}`, {
+    const response = await fetch(`${API_BASE_URL}/students/search?${queryParams}`, {
       method: 'GET',
       headers: getHeaders()
     });
@@ -74,7 +74,7 @@ const studentApi = {
   },
 
   async createStudent(data: StudentCreate) {
-    const response = await fetch(`${API_BASE_URL}/students`, {
+    const response = await fetch(`${API_BASE_URL}/students/create`, {
       method: 'POST',
       headers: getHeaders(),
       body: JSON.stringify({

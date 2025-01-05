@@ -2,12 +2,13 @@
 name = 'sudo Update'
 description = 'Edytuj studenta przez Admina'
 method = 'PUT'
-url = '{{baseUrl}}/api/student/sudoupdate/:id'
+url = '{{baseUrl}}/api/students/sudoupdate/:id'
 sortWeight = 3750000
 id = 'cd117349-8161-457f-bf30-414be99eb2a2'
 
 [[pathVariables]]
 key = 'id'
+value = '2'
 
 [body]
 type = 'JSON'
