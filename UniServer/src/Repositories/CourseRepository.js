@@ -2,6 +2,8 @@ const Student = require('../DomainModels/Student');
 const Program = require('../DomainModels/Program');
 const Course = require('../DomainModels/Course');
 const Professor = require('../DomainModels/Professor');
+const Employee = require('../DomainModels/Employee');
+const Account = require('../DomainModels/Account');
 
 class CourseRepository {
     constructor(sequelize) {
@@ -10,6 +12,8 @@ class CourseRepository {
         this.Program = sequelize.models.Program;
         this.Professor = sequelize.models.Professor;
         this.Student = sequelize.models.Student;
+        this.Employee = sequelize.models.Employee;
+        this.Account = sequelize.models.Account;
     }
 
     getProgramId(dbModel) {
@@ -27,7 +31,13 @@ class CourseRepository {
         }
 
         if (plainData.Professor) {
-            course.Professor = new Professor(plainData.Professor);
+            course.professor = new Professor(plainData.Professor);
+            if(plainData.Professor.Employee){
+                course.professor.employee = new Employee(plainData.Professor.Employee)
+                if(plainData.Professor.Employee.Account){
+                    course.professor.employee.account = new Account(plainData.Professor.Employee.Account)
+                }
+            }
         }
 
         if (plainData.Students) {
@@ -74,7 +84,19 @@ class CourseRepository {
                     {
                         model: this.Professor,
                         required: true,
-                        attributes: ['Professor_id', 'first_name', 'last_name']
+                        attributes: ['Professor_id', 'first_name', 'last_name'],
+                        include: [
+                            {
+                                model: this.Employee,
+                                required: true,
+                                include: [
+                                    {
+                                        model: this.Account,
+                                        required: true
+                                    }
+                                ]
+                            }
+                        ]
                     }
                 ]
             });
@@ -154,6 +176,22 @@ class CourseRepository {
                         model: this.Program,
                         required: true,
                     },
+                    {
+                        model: this.Professor,
+                        required: true,
+                        include: [
+                            {
+                                model: this.Employee,
+                                required: true,
+                                include: [
+                                    {
+                                        model: this.Account,
+                                        required: true
+                                    }
+                                ]
+                            }
+                        ]
+                    }
                 ]
             };
 

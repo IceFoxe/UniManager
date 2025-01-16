@@ -142,7 +142,7 @@ class StudentRepository {
                     {
                         model: this.Account,
                         required: true,
-                        attributes: ['first_name', 'last_name', 'account_id']
+                        attributes: ['first_name', 'last_name', 'account_id', 'email', 'login']
                     },{
                     model: this.Program,
                     required: true,

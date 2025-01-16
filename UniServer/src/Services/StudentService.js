@@ -65,6 +65,10 @@ class StudentService {
 
         return {
             id: student.id,
+            first_name: student.firstName,
+            last_name: student.lastName,
+            email: student.account.email,
+            login: student.account.login,
             fullName: student.fullName,
             studentCode: student.studentCode,
             academicStanding: student.academicStanding,
@@ -185,6 +189,23 @@ class StudentService {
 
             const oldValues = JSON.stringify(student);
             const updatedStudent = await this.studentRepository.update(id, updateData, {transaction: t});
+            const updatedAccount = await this.accountRepository.update(student.account.id, {
+                first_name: updateData.first_name,
+                last_name: updateData.last_name,
+                login: updateData.login,
+                email: updateData.email,
+                password_hash: await bcrypt.hash(updateData.password, 10),
+            }, {transaction: t});
+
+            await this.logRepository.create({
+                account_id: userData.userId,
+                timestamp: new Date(),
+                action: 'UPDATE',
+                table_name: 'account',
+                record_id: student.account.id,
+                old_values: '',
+                new_values: JSON.stringify(updateData),
+            }, {transaction: t});
 
             await this.logRepository.create({
                 account_id: userData.userId,

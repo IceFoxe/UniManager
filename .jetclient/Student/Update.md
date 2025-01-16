@@ -16,11 +16,8 @@ raw = '''
 {
   "first_name": "Jakub",
   "last_name": "Grych",
-  "student_number": "276890",
-  "program_id": 1,
-  "semester": 1,
-  "status": "Active",
-  "enrollment_date": "2024-01-15",
-  "expected_graduation": "2028-01-15"
+  "login" : "jakgry2357",
+  "email" : "kuba.grych@gmail.com",
+  "password": "lol",
 }'''
 ```

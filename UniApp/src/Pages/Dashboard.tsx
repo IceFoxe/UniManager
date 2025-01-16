@@ -45,7 +45,6 @@ import Courses from '../Components/views/Pulpit/Courses.tsx';
 import TrendAnalysis from '../Components/views/Analityka/TrendAnalysis';
 import UserInsights from '../Components/views/Analityka/UserInsights';
 import ConversionRates from '../Components/views/Analityka/ConversionRates';
-import Account from '../Components/views/Ustawienia/Account';
 import Preferences from '../Components/views/Ustawienia/Preferences';
 import UserData from '../Components/views/Konto/UserData';
 import Grades2 from '../Components/views/Konto/Grades';
@@ -182,7 +181,7 @@ const DashboardLayout: React.FC = () => {
             {label: 'Kierunki', key: 'programs', component: ConversionRates}
         ],
         S: [
-            {label: 'Konto', key: 'account', component: Account},
+            {label: 'Konto', key: 'account', component: UserData},
             {label: 'Preferencje', key: 'preferences', component: Preferences},
         ],
         K: [

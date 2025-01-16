@@ -88,7 +88,7 @@ class CourseService {
                 credits: course.credits,
                 semester: course.semester,
                 mandatory: course.mandatory,
-                teacherName: `${course.teacher?.firstName} ${course.teacher?.lastName}`
+                teacherName: `${course.professor?.employee?.account?.firstName} ${course.professor?.employee?.account?.lastName}`
             })),
             total: result.total
         };
@@ -107,7 +107,7 @@ class CourseService {
                 credits: course.credits,
                 semester: course.semester,
                 mandatory: course.mandatory,
-                teacherName: `${course.teacher?.firstName} ${course.teacher?.lastName}`
+                teacherName: `${course.professor?.employee?.account?.firstName} ${course.professor?.employee?.account?.lastName}`
             })),
             total: result.total
         };

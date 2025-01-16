@@ -105,6 +105,33 @@ class AccountRepository {
 
     }
 
+    async update(id, accountData, options = {}) {
+        try {
+            const account = await this.Account.findOne({
+                where: {account_id: id},
+                transaction: options.transaction
+            });
+
+            if (!account) {
+                throw new Error(`Student with ID ${id} not found`);
+            }
+
+            await account.update({
+                first_name: accountData.first_name,
+                last_name: accountData.last_name,
+                login: accountData.login,
+                email: accountData.email,
+                password_hash: accountData.password_hash,
+                updated_at: new Date()
+            }, {transaction: options.transaction});
+
+            return this.toDomainModel(account);
+        } catch (error) {
+            throw error;
+        }
+
+    }
+
     async delete(accountId, options = {}) {
         try {
             const account = await this.Account.findByPk(accountId);

@@ -7,7 +7,7 @@ class Course {
         this.semester = data.semester;
         this.mandatory = data.mandatory;
         this._program = null;
-        this._teacher = null;
+        this._professor = null;
         this._students = [];
     }
 
@@ -19,12 +19,12 @@ class Course {
         this._program = program;
     }
 
-    get teacher() {
-        return this._teacher;
+    get professor() {
+        return this._professor;
     }
 
-    set teacher(teacher) {
-        this._teacher = teacher;
+    set professor(professor) {
+        this._professor = professor;
     }
 
     get students() {

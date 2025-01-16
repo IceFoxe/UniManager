@@ -1,3 +1,5 @@
+const {sequelize} = require("../Config/DataBaseConfig");
+
 class Professor {
     static ACADEMIC_TITLES = ['Assistant Professor', 'Associate Professor', 'Full Professor'];
 
@@ -8,8 +10,16 @@ class Professor {
         this.academicTitle = data.academicTitle || 'Assistant Professor';
         this.officeRoom = data.officeRoom;
         this.createdAt = data.createdAt || new Date();
+        this._employee = null;
     }
 
+    get employee() {
+        return this._employee;
+    }
+
+    set employee(employee) {
+        this._employee = employee;
+    }
     validate() {
         if (!this.facultyId || !Number.isInteger(this.facultyId)) {
             throw new Error('Invalid faculty ID');
