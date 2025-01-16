@@ -41,6 +41,7 @@ class GradeService {
         return {
             data: result.data.map(grade => ({
                 id: grade.id,
+                courseName: grade.course.name,
                 value: grade.value.toFixed(1),
                 description: grade.getDescription(),
                 date: grade.date,

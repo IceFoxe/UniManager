@@ -93,13 +93,27 @@ const studentApi = {
   },
 
   async updateStudent(id: string, data: Partial<Student>): Promise<Student> {
-    const response = await fetch(`${API_BASE_URL}/students/${id}`, {
+    const response = await fetch(`${API_BASE_URL}/students/sudoupdate/${id}`, {
       method: 'PUT',
       headers: getHeaders(),
-      body: JSON.stringify(data)
+      body: JSON.stringify({
+        first_name: data.fullName,
+        last_name: data.fullName,
+        student_number: data.studentCode,
+        program_id: data.programId,
+        status: data.status,
+      })
     });
+    console.log(JSON.stringify({
+        first_name: data.fullName,
+        last_name: data.fullName,
+        student_number: data.studentCode,
+        program_id: data.programId,
+        status: data.status,
+      }));
+    console.log(response.json());
 
-    return handleResponse<Student>(response);
+    return response.json();
   }
 };
 

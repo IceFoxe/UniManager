@@ -28,6 +28,10 @@ module.exports = (sequelize) => {
          checkPermission(['admin', 'professor', 'student']), (req, res) =>
             courseController.getCoursesByProgram(req, res));
 
+    router.get('/student/:studentId',  auth,
+         checkPermission(['admin', 'professor', 'student']), (req, res) =>
+            courseController.getCoursesByStudentId(req, res));
+
     router.put('/:id',  auth,
          checkPermission(['admin']), (req, res) =>
             courseController.updateCourse(req, res));

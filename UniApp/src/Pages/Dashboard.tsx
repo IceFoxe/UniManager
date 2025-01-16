@@ -38,6 +38,7 @@ import OverviewProfessor from '../Components/views/Pulpit/Prowadzacy/Overview';
 import OverviewEmployee from '../Components/views/Pulpit/Pracownik/AdminDashboard';
 import Performance from '../Components/views/Pulpit/Student/Courses.tsx';
 import Grades from '../Components/views/Pulpit/Student/Grades.tsx';
+import StudentCourses from '../Components/views/Pulpit/Student/Courses.tsx';
 import Faculties from '../Components/views/Pulpit/Faculties.tsx';
 import Programs from '../Components/views/Pulpit/Programs.tsx';
 import Courses from '../Components/views/Pulpit/Courses.tsx';
@@ -161,7 +162,7 @@ const DashboardLayout: React.FC = () => {
         ],
         D: [
             {label: 'Widok Główny', key: 'overview', component: Overview},
-            {label: 'Moje Kursy', key: 'performance', component: Performance},
+            {label: 'Moje Kursy', key: 'performance', component: StudentCourses},
             {label: 'Moje Oceny', key: 'metrics', component: Grades}
         ],
         E: [

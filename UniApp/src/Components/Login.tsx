@@ -48,6 +48,7 @@ interface LoginResponse {
             role: string;
             firstName: string;
             lastName: string;
+            entity_id: number;
         };
     };
     message?: string;

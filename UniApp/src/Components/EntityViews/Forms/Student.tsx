@@ -262,7 +262,7 @@ const StudentForm = ({ onSubmit, onClose, isLoading = false }: Props) => {
   };
 
   return (
-      <FormContainer onSubmit={handleSubmit} noValidate>
+      <FormContainer onSubmit={handleSubmit}>
         <FormTitle variant="h6">Add New Student</FormTitle>
 
         <Stack spacing={3}>

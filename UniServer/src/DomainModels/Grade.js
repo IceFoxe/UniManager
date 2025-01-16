@@ -4,6 +4,7 @@ class Grade {
         this.value = data.value;
         this.date = data.date;
         this._student = null;
+        this._course = null;
     }
 
     get student() {
@@ -11,6 +12,13 @@ class Grade {
     }
 
     set student(student) {
+        this._student = student;
+    }
+    get course() {
+        return this._student;
+    }
+
+    set course(student) {
         this._student = student;
     }
 

@@ -34,6 +34,7 @@ class AuthController {
         }
 
         try {
+
             const account = await models.Account.findOne({
                 where: {
                     [Op.or]: [
@@ -50,12 +51,23 @@ class AuthController {
                 });
             }
 
+            const student = await models.Student.findOne({
+                where: {
+                    account_id: account.account_id
+                }
+            });
+
             const isValidPassword = await bcrypt.compare(password, account.password_hash);
             if (!isValidPassword) {
                 return res.status(401).json({
                     status: 'error',
                     message: 'Invalid credentials'
                 });
+            }
+
+            let entityId = 0;
+            if (student?.student_id != null){
+                entityId = student.student_id;
             }
 
             const userData = {
@@ -85,7 +97,8 @@ class AuthController {
                         email: account.email,
                         role: account.role,
                         firstName: account.first_name,
-                        lastName: account.last_name
+                        lastName: account.last_name,
+                        entity_id: entityId
                     }
                 }
             });

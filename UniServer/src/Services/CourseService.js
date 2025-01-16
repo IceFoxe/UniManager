@@ -94,6 +94,25 @@ class CourseService {
         };
     }
 
+    async getCoursesByStudentId(studentId, query) {
+        const result = await this.courseRepository.findByStudentId(studentId, {
+            semester: query.semester
+        });
+
+        return {
+            data: result.data.map(course => ({
+                id: course.id,
+                name: course.name,
+                code: course.code,
+                credits: course.credits,
+                semester: course.semester,
+                mandatory: course.mandatory,
+                teacherName: `${course.teacher?.firstName} ${course.teacher?.lastName}`
+            })),
+            total: result.total
+        };
+    }
+
     async updateCourse(id, courseData, userData) {
         const t = await this.courseRepository.sequelize.transaction();
         try {

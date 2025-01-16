@@ -14,9 +14,16 @@ import {
 } from '@mui/material';
 
 interface Grade {
+  courseName: string;
   value: number;
   course_id: string;
   createdAt: string;
+  date: Date;
+}
+
+interface AuthUser {
+  entity_id: string;
+  token: string;
 }
 
 const GradesComponent: React.FC = () => {
@@ -28,12 +35,15 @@ const GradesComponent: React.FC = () => {
     const fetchGrades = async () => {
       try {
         const authToken = localStorage.getItem('authToken');
+        const userDataStr = localStorage.getItem('user');
 
-        if (!authToken) {
-          throw new Error('No authentication token found');
+        if (!authToken || !userDataStr) {
+          throw new Error('No authentication data found');
         }
 
-        const response = await fetch('http://localhost:3001/api/grades', {
+        const userData = JSON.parse(userDataStr) as AuthUser;
+
+        const response = await fetch(`http://localhost:3001/api/grades/student/${userData.entity_id}`, {
           headers: {
             'Authorization': `Bearer ${authToken}`,
             'Content-Type': 'application/json'
@@ -48,7 +58,8 @@ const GradesComponent: React.FC = () => {
         }
 
         const data = await response.json();
-        setGrades(data);
+        console.log(data);
+        setGrades(data.data);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'An error occurred');
       } finally {
@@ -76,7 +87,7 @@ const GradesComponent: React.FC = () => {
   }
 
   return (
-    <Paper sx={{ mx: 'auto', mt: 2, p: 2, background:  '#151515', boxShadow: '0', border: '1px solid rgba(255,255,255,0.1)'}}>
+    <Paper sx={{ mx: 'auto', mt: 2, p: 2, background: '#151515', boxShadow: '0', border: '1px solid rgba(255,255,255,0.1)' }}>
       <Typography variant="h5" component="h2" gutterBottom>
         Oceny studenta
       </Typography>
@@ -93,9 +104,9 @@ const GradesComponent: React.FC = () => {
           <TableBody>
             {grades.map((grade, index) => (
               <TableRow key={index} hover>
-                <TableCell>{grade.course_id}</TableCell>
+                <TableCell>{grade.courseName}</TableCell>
                 <TableCell>{grade.value}</TableCell>
-                <TableCell>{new Date(grade.createdAt).toLocaleDateString()}</TableCell>
+                <TableCell>{new Date(grade.date).toLocaleDateString()}</TableCell>
               </TableRow>
             ))}
             {grades.length === 0 && (

@@ -13,6 +13,8 @@ class EmployeeService {
         return {
             data: result.data.map(employee => ({
                 id: employee.id,
+                first_name: employee.account.first_name,
+                last_name: employee.account.last_name,
                 position: employee.position,
                 employmentDate: employee.employmentDate,
                 isAdmin: employee.isAdministrator,

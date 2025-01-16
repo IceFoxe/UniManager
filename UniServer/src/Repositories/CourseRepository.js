@@ -12,6 +12,12 @@ class CourseRepository {
         this.Student = sequelize.models.Student;
     }
 
+    getProgramId(dbModel) {
+         const plainData = dbModel.get({ plain: true });
+         const student = new Student(plainData);
+         return plainData.Program.id
+    }
+
     toDomainModel(dbModel) {
         const plainData = dbModel.get({ plain: true });
         const course = new Course(plainData);
@@ -115,6 +121,34 @@ class CourseRepository {
         try {
             const queryOptions = {
                 where: { program_id: programId },
+                include: [
+                    {
+                        model: this.Program,
+                        required: true,
+                    },
+                ]
+            };
+
+            if (semester) queryOptions.where.semester = semester;
+
+            const { rows, count } = await this.Course.findAndCountAll(queryOptions);
+
+            return {
+                data: rows.map(course => this.toDomainModel(course)),
+                total: count
+            };
+        } catch (error) {
+            throw new Error(`Failed to fetch program courses: ${error.message}`);
+        }
+    }
+    async findByStudentId(studentId, options = {}) {
+        const { semester } = options;
+        try {
+            const student = await this.Student.findOne({
+                where: {student_id: studentId}
+            })
+            const queryOptions = {
+                where: { program_id: student.program_id},
                 include: [
                     {
                         model: this.Program,

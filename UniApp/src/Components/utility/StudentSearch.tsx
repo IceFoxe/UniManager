@@ -16,7 +16,6 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  Paper,
   Typography,
   CircularProgress,
   Alert,
@@ -34,7 +33,6 @@ import { debounce, isArray } from 'lodash';
 import StudentDetails from '../EntityViews/Uneditables/Student';
 import StudentForm from '../EntityViews/Forms/Student';
 
-// Theme and styling
 const theme = {
   palette: {
     primary: {

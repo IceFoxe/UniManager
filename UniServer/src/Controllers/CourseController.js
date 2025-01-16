@@ -47,6 +47,15 @@ class CourseController {
         }
     }
 
+    async getCoursesByStudentId(req, res) {
+        try {
+            const result = await this.courseService.getCoursesByStudentId(req.params.studentId, req.query);
+            res.json(result);
+        } catch (error) {
+            res.status(500).json({ error: error.message });
+        }
+    }
+
     async updateCourse(req, res) {
         try {
             const course = await this.courseService.updateCourse(req.params.id, req.body);

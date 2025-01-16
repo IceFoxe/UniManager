@@ -1,4 +1,5 @@
 const Student = require('../DomainModels/Student');
+const Course = require('../DomainModels/Course');
 const Grade = require('../DomainModels/Grade');
 
 const Account = require('../DomainModels/Account');
@@ -8,6 +9,7 @@ class GradeRepository {
         this.sequelize = sequelize;
         this.Grade = sequelize.models.Grade;
         this.Student = sequelize.models.Student;
+        this.Course = sequelize.models.Course;
         this.Group = sequelize.models.Group;
     }
 
@@ -17,6 +19,10 @@ class GradeRepository {
 
         if (plainData.Student) {
             grade.student = new Student(plainData.Student);
+        }
+
+        if (plainData.Course){
+            grade.course = new Course(plainData.Course);
         }
 
 
@@ -60,6 +66,10 @@ class GradeRepository {
                         model: this.Student,
                         required: true
                     },
+                    {
+                        model: this.Course,
+                        required: true
+                    }
                 ],
                 order: [['date', 'DESC']]
             });
