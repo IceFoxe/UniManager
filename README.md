@@ -1,4 +1,3 @@
-*Yes, I know that .env was exposed, and I'm aware that it's unacceptable in a professional setting, but it's just a solo project that will never see daylight*
 # UniManager
 
 UniManager is an app created as a university project for a database course. I went with SQL Server as a database choice which, after the experience of working with it, wasn't the best decision because of the sheer size of this moloch. I wish I'd used Postgres. 
