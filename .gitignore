@@ -1,0 +1,6 @@
+.env
+.jetclient
+/UniServer/.env
+/node_modules
+/UniServer/node_modules
+/UniApp/node_modules
